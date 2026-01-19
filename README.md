@@ -2,7 +2,7 @@
 
 A modern small demo application built with Vaadin 25 and Spring Boot, demonstrating advanced UI concepts, dynamic scheming dark/light mode, and full internationalization within a Star Wars-themed context.
 
-![Demo](docs/demo/Demo.webp)
+
 
 ### 🌐 Live Demo
 Check out the live application here: [https://starwars.gladtek.com/](https://starwars.gladtek.com/)
