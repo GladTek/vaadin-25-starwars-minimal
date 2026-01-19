@@ -47,7 +47,6 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 *   **Localized Components**: All UI elements, including complex components like the `DatePicker` (months, weekdays, buttons), are dynamically localized.
 
 ### Theming & UX
-*   **Dynamic Theme Switching**: Seamlessly switch between **Lumo** (Default) and **Aura** themes.
 *   **Side-based Styling**: The application's visual density and color palette adapt based on the user's initial "Light" or "Dark" side selection.
 *   **404 Page**: A custom, localized "Page Not Found" experience that guides users back to safety.
 
