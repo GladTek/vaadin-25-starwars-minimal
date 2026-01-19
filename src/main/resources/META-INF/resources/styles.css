@@ -1,0 +1,21 @@
+.split-side {
+    cursor: pointer;
+    overflow: hidden; /* Ensure content doesn't spill out */
+    transition: background-color 0.3s;
+}
+
+.lego-image {
+    transition: transform 0.3s ease-in-out;
+}
+
+.split-side:hover .lego-image {
+    transform: rotate(15deg) scale(1.5); /* Rotate and slight scale for better effect */
+}
+
+.split-text {
+    transition: transform 0.3s ease-in-out;
+}
+
+.split-side:hover .split-text {
+    transform: translateY(10px);
+}
