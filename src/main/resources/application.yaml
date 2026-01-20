@@ -11,3 +11,11 @@ vaadin:
   copilot:
     enable: false
 
+app:
+  meta:
+    og:
+      title: "Vaadin 25 Star Wars Demo"
+      description: "A modern small demo application built with Vaadin 25 and Spring Boot, demonstrating advanced UI concepts, dynamic scheming dark/light mode, and full internationalization within a Star Wars-themed context."
+      image: "https://starwars.gladtek.com/icons/icon.png"
+      url: "https://starwars.gladtek.com"
+      type: "website"
