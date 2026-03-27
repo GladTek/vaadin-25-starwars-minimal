@@ -69,6 +69,7 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
     private void createDrawer() {
 
         SideNav nav = new SideNav();
+        nav.setLabel(getTranslation("nav.main"));
         dashboardItem = new SideNavItem(getTranslation("nav.dashboard"), DashboardView.class, VaadinIcon.DASHBOARD.create());
         planetsItem = new SideNavItem(getTranslation("nav.planets"), PlanetsView.class, VaadinIcon.GLOBE.create());
         componentsItem = new SideNavItem(getTranslation("nav.components"), ComponentsView.class, VaadinIcon.CUBES.create());
@@ -78,6 +79,7 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
         nav.addItem(componentsItem);
 
         SideNav footerNav = new SideNav();
+        footerNav.setLabel(getTranslation("nav.footer"));
         logoutItem = new SideNavItem(getTranslation("nav.logout"), LogoutView.class, VaadinIcon.SIGN_OUT.create());
         footerNav.addItem(logoutItem);
         footerNav.setWidthFull();
