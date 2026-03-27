@@ -29,7 +29,7 @@ public class NotFoundView extends VerticalLayout implements HasErrorParameter<No
         header = new H1();
         description = new Paragraph();
         backButton = new Button();
-        backButton.addThemeVariants(ButtonVariant.AURA_PRIMARY);
+        backButton.addThemeVariants(ButtonVariant.PRIMARY);
         backButton.addClickListener(e -> UI.getCurrent().navigate(""));
 
         add(header, description, backButton);

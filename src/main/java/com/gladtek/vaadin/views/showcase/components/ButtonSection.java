@@ -20,9 +20,9 @@ public class ButtonSection extends VerticalLayout {
         row1.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         row1.getStyle().set("gap", "10px");
         row1.add(new Button(getTranslation("components.button.default")));
-        row1.add(createVariantButton(getTranslation("components.button.primary"), ButtonVariant.AURA_PRIMARY));
-        row1.add(createVariantButton(getTranslation("components.button.tertiary"), ButtonVariant.AURA_TERTIARY));
-        row1.add(createVariantButton(getTranslation("components.button.danger"), ButtonVariant.AURA_DANGER));
+        row1.add(createVariantButton(getTranslation("components.button.primary"), ButtonVariant.PRIMARY));
+        row1.add(createVariantButton(getTranslation("components.button.tertiary"), ButtonVariant.TERTIARY));
+        row1.add(createVariantButton(getTranslation("components.button.danger"), ButtonVariant.ERROR));
         add(row1);
         add(createSpacer());
 
@@ -30,9 +30,9 @@ public class ButtonSection extends VerticalLayout {
         row2.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         row2.getStyle().set("gap", "10px");
         row2.add(createIconButton(getTranslation("components.button.default"), VaadinIcon.PLUS.create(), false));
-        row2.add(createIconButton(getTranslation("components.button.primary"), VaadinIcon.PLUS.create(), false, ButtonVariant.AURA_PRIMARY));
-        row2.add(createIconButton(getTranslation("components.button.tertiary"), VaadinIcon.PLUS.create(), false, ButtonVariant.AURA_TERTIARY));
-        row2.add(createIconButton(getTranslation("components.button.danger"), VaadinIcon.TRASH.create(), false, ButtonVariant.AURA_DANGER));
+        row2.add(createIconButton(getTranslation("components.button.primary"), VaadinIcon.PLUS.create(), false, ButtonVariant.PRIMARY));
+        row2.add(createIconButton(getTranslation("components.button.tertiary"), VaadinIcon.PLUS.create(), false, ButtonVariant.TERTIARY));
+        row2.add(createIconButton(getTranslation("components.button.danger"), VaadinIcon.TRASH.create(), false, ButtonVariant.ERROR));
         add(row2);
         add(createSpacer());
 
@@ -40,9 +40,9 @@ public class ButtonSection extends VerticalLayout {
         row3.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         row3.getStyle().set("gap", "10px");
         row3.add(createIconButton(getTranslation("components.button.default"), VaadinIcon.ARROW_RIGHT.create(), true));
-        row3.add(createIconButton(getTranslation("components.button.primary"), VaadinIcon.ARROW_RIGHT.create(), true, ButtonVariant.AURA_PRIMARY));
-        row3.add(createIconButton(getTranslation("components.button.tertiary"), VaadinIcon.ARROW_RIGHT.create(), true, ButtonVariant.AURA_TERTIARY));
-        row3.add(createIconButton(getTranslation("components.button.danger"), VaadinIcon.TRASH.create(), true, ButtonVariant.AURA_DANGER));
+        row3.add(createIconButton(getTranslation("components.button.primary"), VaadinIcon.ARROW_RIGHT.create(), true, ButtonVariant.PRIMARY));
+        row3.add(createIconButton(getTranslation("components.button.tertiary"), VaadinIcon.ARROW_RIGHT.create(), true, ButtonVariant.TERTIARY));
+        row3.add(createIconButton(getTranslation("components.button.danger"), VaadinIcon.TRASH.create(), true, ButtonVariant.ERROR));
         add(row3);
     }
 

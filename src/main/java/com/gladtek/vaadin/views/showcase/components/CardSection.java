@@ -44,7 +44,7 @@ public class CardSection extends VerticalLayout {
 
         // Footer (Actions)
         Button bookBtn = new Button(getTranslation("components.card.action.book"));
-        bookBtn.addThemeVariants(ButtonVariant.AURA_PRIMARY);
+        bookBtn.addThemeVariants(ButtonVariant.PRIMARY);
 
         Button learnBtn = new Button(getTranslation("components.card.action.learn"));
         imageCard.addToFooter(bookBtn, learnBtn);

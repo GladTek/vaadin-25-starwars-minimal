@@ -40,6 +40,7 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
     *   **Inputs**: Text fields, date pickers (with localized "Today"/"Cancel" buttons), time pickers.
     *   **Cards**: Standard cards and advanced variants with media images, badges, and footer actions.
     *   **Display**: Grids, Tabs, Accordions, and Dialogs.
++    *   **Experimental**: Showcases upcoming Vaadin features like **Badges**, **Sliders**, and **RangeSliders** (enabled via feature flags).
 
 ### Internationalization (i18n)
 *   **Multi-language Support**: Full support for **English**, **French**, **German**, and **Arabic**.
@@ -55,8 +56,8 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 ## 2. Technical Overview
 
 ### Technology Stack
-*   **Framework**: Vaadin Flow 25.0.3
-*   **Backend**: Spring Boot 4.0.1 (Java 21)
+*   **Framework**: Vaadin Flow 25.1.0
+*   **Backend**: Spring Boot 4.0.4 (Java 21)
 *   **Build Tool**: Maven
 
 ### Architecture & Patterns
@@ -80,6 +81,7 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
     *   `DisplaySection`: Grids, Tabs, Accordions.
     *   `CardSection`: Standard and advanced Cards.
     *   `DialogSection`: Dialogs and Notifications.
++    *   `ExperimentalSection`: Demonstrates experimental components (Slider, RangeSlider) and new Badge variants.
 
 ### Localization Structure
 *   Resources stored in `src/main/resources/vaadin-i18n/`.
