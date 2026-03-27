@@ -3,7 +3,9 @@ package com.gladtek.vaadin.components;
 import com.gladtek.vaadin.util.LanguageHelper;
 import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 import java.util.Locale;
 
@@ -15,18 +17,10 @@ public class LanguageSwitcher extends Select<Locale> {
         Locale arabic = Locale.forLanguageTag("ar");
 
         setItems(Locale.ENGLISH, arabic, Locale.FRENCH, Locale.GERMAN);
-        setItemLabelGenerator(locale -> {
-            if (locale.equals(Locale.ENGLISH)) {
-                return "English";
-            } else if (locale.equals(arabic)) {
-                return "العربية";
-            } else if (locale.equals(Locale.FRENCH)) {
-                return "Français";
-            } else if (locale.equals(Locale.GERMAN)) {
-                return "Deutsch";
-            }
-            return locale.getDisplayName();
-        });
+        setRenderer(new ComponentRenderer<>(locale -> {
+            Span span = new Span(getLabel(locale, arabic));
+            return span;
+        }));
 
 
         Locale current = UI.getCurrent().getLocale();
@@ -48,5 +42,18 @@ public class LanguageSwitcher extends Select<Locale> {
         });
 
         setWidth("120px");
+    }
+
+    private String getLabel(Locale locale, Locale arabic) {
+        if (locale.equals(Locale.ENGLISH)) {
+            return "English";
+        } else if (locale.equals(arabic)) {
+            return "العربية";
+        } else if (locale.equals(Locale.FRENCH)) {
+            return "Français";
+        } else if (locale.equals(Locale.GERMAN)) {
+            return "Deutsch";
+        }
+        return locale.getDisplayName();
     }
 }

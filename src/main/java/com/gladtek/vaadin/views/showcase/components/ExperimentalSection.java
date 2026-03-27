@@ -35,6 +35,8 @@ public class ExperimentalSection extends VerticalLayout {
         
         RangeSlider rangeSlider = new RangeSlider(getTranslation("components.slider.price_range"), 0, 1000);
         rangeSlider.setValue(new RangeSliderValue(200, 800));
+        rangeSlider.getElement().setAttribute("role", "group");
+        rangeSlider.getElement().setAttribute("aria-label", getTranslation("components.slider.price_range_aria"));
         add(rangeSlider);
 
         Slider sliderMinMax = new Slider(getTranslation("components.slider.temperature"), 0, 100);

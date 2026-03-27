@@ -5,7 +5,9 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 public class SelectionSection extends VerticalLayout {
 
@@ -22,6 +24,10 @@ public class SelectionSection extends VerticalLayout {
         Select<String> select = new Select<>();
         select.setLabel(getTranslation("components.select.select"));
         select.setItems(getTranslation("components.select.optionA"), getTranslation("components.select.optionB"), getTranslation("components.select.optionC"));
+        select.setRenderer(new ComponentRenderer<>(option -> {
+            Span span = new Span(option);
+            return span;
+        }));
         select.setValue(getTranslation("components.select.optionA"));
 
         row1.add(comboBox, select);
