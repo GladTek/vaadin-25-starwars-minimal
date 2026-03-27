@@ -15,6 +15,8 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -57,11 +59,14 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
 
         LanguageSwitcher languageSwitcher = new LanguageSwitcher();
 
-        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, schemeToggle, languageSwitcher);
+        HorizontalLayout headerLayout = new HorizontalLayout(new DrawerToggle(), logo, schemeToggle, languageSwitcher);
 
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.expand(logo);
-        header.setWidth("100%");
+        headerLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        headerLayout.expand(logo);
+        headerLayout.setWidth("100%");
+
+        Header header = new Header(headerLayout);
+        header.setWidthFull();
 
         addToNavbar(header);
     }
@@ -86,6 +91,17 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
 
         Scroller scroller = new Scroller(nav);
         addToDrawer(scroller, footerNav);
+    }
+
+    @Override
+    public void setContent(com.vaadin.flow.component.Component content) {
+        if (content instanceof Main) {
+            super.setContent(content);
+        } else {
+            Main main = new Main(content);
+            main.setSizeFull();
+            super.setContent(main);
+        }
     }
 
     @Override

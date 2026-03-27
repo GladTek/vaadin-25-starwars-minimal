@@ -7,6 +7,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
@@ -27,12 +28,21 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
         setSpacing(false);
         setPadding(false);
 
+        Main mainContent = new Main();
+        mainContent.setSizeFull();
+        mainContent.getStyle().set("display", "flex"); // Ensure it behaves like a flex container if needed, but HorizontalLayout is better
+        
+        HorizontalLayout splitLayout = new HorizontalLayout();
+        splitLayout.setSizeFull();
+        splitLayout.setSpacing(false);
+        splitLayout.setPadding(false);
+
         LanguageSwitcher languageSwitcher = new LanguageSwitcher();
         languageSwitcher.getStyle().set("position", "absolute");
         languageSwitcher.getStyle().set("top", "20px");
         languageSwitcher.getStyle().set("right", "20px");
         languageSwitcher.getStyle().set("z-index", "10");
-        add(languageSwitcher);
+        add(languageSwitcher); // Switcher stays outside main or inside? Usually outside is fine or inside main.
 
         darkTitle = new H1();
         darkDesc = new Paragraph();
@@ -60,10 +70,12 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
                 userSession
         );
 
-        add(darkSide, lightSide);
+        splitLayout.add(darkSide, lightSide);
+        splitLayout.setFlexGrow(1, darkSide);
+        splitLayout.setFlexGrow(1, lightSide);
 
-        setFlexGrow(1, darkSide);
-        setFlexGrow(1, lightSide);
+        mainContent.add(splitLayout);
+        add(mainContent);
 
         updateTexts();
     }
