@@ -65,7 +65,7 @@ public class DialogSection extends VerticalLayout {
 
         HorizontalLayout layout = new HorizontalLayout(icon,
                 new Text(getTranslation("components.notification.success.text")));
-        layout.addToEnd(viewBtn, createCloseBtn());
+        layout.addToEnd(viewBtn, createCloseBtn(notification));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setMinWidth("350px");
 
@@ -83,7 +83,7 @@ public class DialogSection extends VerticalLayout {
 
         HorizontalLayout layout = new HorizontalLayout(icon,
                 new Text(getTranslation("components.notification.error.text")));
-        layout.addToEnd(retryBtn, createCloseBtn());
+        layout.addToEnd(retryBtn, createCloseBtn(notification));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setMinWidth("350px");
 
@@ -100,11 +100,13 @@ public class DialogSection extends VerticalLayout {
         Span name = new Span(getTranslation("components.notification.mention.user"));
         name.getStyle().set("font-weight", "500");
 
-        Div info = new Div(name, new Text(" " +getTranslation("components.notification.mention.text") + " "),
-                new Anchor("#", getTranslation("components.notification.mention.project")));
+        Anchor projectLink = new Anchor("https://gladtek.com", getTranslation("components.notification.mention.project"));
+        projectLink.setTarget("_blank");
+
+        Div info = new Div(name, new Text(" " + getTranslation("components.notification.mention.text") + " "), projectLink);
 
         HorizontalLayout layout = new HorizontalLayout(avatar, info);
-        layout.addToEnd(createCloseBtn());
+        layout.addToEnd(createCloseBtn(notification));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setMinWidth("350px");
 
@@ -113,8 +115,8 @@ public class DialogSection extends VerticalLayout {
         return notification;
     }
 
-    public Button createCloseBtn() {
-        Button closeBtn = new Button(VaadinIcon.CLOSE_SMALL.create());
+    public Button createCloseBtn(Notification notification) {
+        Button closeBtn = new Button(VaadinIcon.CLOSE_SMALL.create(), e -> notification.close());
         closeBtn.setAriaLabel(getTranslation("components.dialog.close_aria"));
         return closeBtn;
     }
