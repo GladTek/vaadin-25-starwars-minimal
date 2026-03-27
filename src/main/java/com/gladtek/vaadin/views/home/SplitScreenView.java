@@ -11,10 +11,11 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 
 @Route("")
-public class SplitScreenView extends HorizontalLayout implements LocaleChangeObserver {
+public class SplitScreenView extends HorizontalLayout implements LocaleChangeObserver, HasDynamicTitle {
 
     private final H1 darkTitle;
     private final Paragraph darkDesc;
@@ -124,5 +125,9 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
         darkDesc.setText(getTranslation("split.dark.desc"));
         lightTitle.setText(getTranslation("split.light.title"));
         lightDesc.setText(getTranslation("split.light.desc"));
+    }
+    @Override
+    public String getPageTitle() {
+        return getTranslation("app.title");
     }
 }

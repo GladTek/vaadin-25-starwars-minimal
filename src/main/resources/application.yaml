@@ -9,7 +9,7 @@ vaadin:
   launch-browser: false
   allowed-packages: com.vaadin,org.vaadin,com.flowingcode,com.gladtek
   copilot:
-    enable: false
+    enable: true
 
 app:
   meta:

@@ -9,10 +9,11 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value = "planets", layout = MainLayout.class)
-public class PlanetsView extends VerticalLayout {
+public class PlanetsView extends VerticalLayout implements HasDynamicTitle {
 
     private final PlanetDetail planetDetail;
     private final H2 title;
@@ -111,5 +112,10 @@ public class PlanetsView extends VerticalLayout {
                 .map(String::trim)
                 .map(part -> getTranslation("planet.term." + part.toLowerCase().replace(" ", "_")))
                 .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    @Override
+    public String getPageTitle() {
+        return getTranslation("nav.planets") + " - " + getTranslation("app.title");
     }
 }

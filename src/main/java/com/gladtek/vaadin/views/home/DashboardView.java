@@ -13,13 +13,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
+import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 @Route(value = "dashboard", layout = MainLayout.class)
-public class DashboardView extends VerticalLayout implements LocaleChangeObserver {
+public class DashboardView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
 
     private final UserSession userSession;
     private final PlanetService planetService;
@@ -197,5 +198,10 @@ public class DashboardView extends VerticalLayout implements LocaleChangeObserve
                 .map(String::trim)
                 .map(part -> getTranslation("planet.term." + part.toLowerCase().replace(" ", "_")))
                 .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    @Override
+    public String getPageTitle() {
+        return getTranslation("nav.dashboard") + " - " + getTranslation("app.title");
     }
 }

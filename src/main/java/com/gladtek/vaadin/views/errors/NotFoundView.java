@@ -13,9 +13,8 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.servlet.http.HttpServletResponse;
 
-@PageTitle("404 - Page Not Found")
 @AnonymousAllowed
-public class NotFoundView extends VerticalLayout implements HasErrorParameter<NotFoundException>, LocaleChangeObserver {
+public class NotFoundView extends VerticalLayout implements HasErrorParameter<NotFoundException>, LocaleChangeObserver, HasDynamicTitle {
 
     private final H1 header;
     private final Paragraph description;
@@ -52,5 +51,10 @@ public class NotFoundView extends VerticalLayout implements HasErrorParameter<No
         header.setText(getTranslation("error.404.title"));
         description.setText(getTranslation("error.404.description"));
         backButton.setText(getTranslation("error.404.back"));
+    }
+
+    @Override
+    public String getPageTitle() {
+        return getTranslation("error.404.title") + " - " + getTranslation("app.title");
     }
 }
