@@ -1,8 +1,11 @@
 package com.gladtek.vaadin.views.showcase.components;
 
 import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.badge.Badge;
+import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -15,24 +18,39 @@ public class DisplaySection extends VerticalLayout {
 
         // Accordion
         Accordion accordion = new Accordion();
-        accordion.add(getTranslation("components.accordion.panel1"), new Span(getTranslation("components.accordion.content1")));
-        accordion.add(getTranslation("components.accordion.panel2"), new Span(getTranslation("components.accordion.content2")));
+        accordion.add(getTranslation("components.accordion.panel1"),
+                new Span(getTranslation("components.accordion.content1")));
+        accordion.add(getTranslation("components.accordion.panel2"),
+                new Span(getTranslation("components.accordion.content2")));
 
         // Tabs
         Tabs tabs = new Tabs();
-        tabs.add(new Tab(getTranslation("components.tabs.tab1")), new Tab(getTranslation("components.tabs.tab2")), new Tab(getTranslation("components.tabs.tab3")));
+        tabs.add(new Tab(getTranslation("components.tabs.tab1")), new Tab(getTranslation("components.tabs.tab2")),
+                new Tab(getTranslation("components.tabs.tab3")));
 
         Grid<Person> grid = new Grid<>(Person.class, false);
         grid.addColumn(Person::getName).setHeader(getTranslation("components.grid.name"));
         grid.addColumn(Person::getAge).setHeader(getTranslation("components.grid.age"));
         grid.setItems(
-                new Person("Alice", 30),
-                new Person("Bob", 25),
-                new Person("Charlie", 35)
-        );
+                new Person(getTranslation("components.sample.name.alice"), 30),
+                new Person(getTranslation("components.sample.name.bob"), 25),
+                new Person(getTranslation("components.sample.name.charlie"), 35));
         grid.setHeight("200px");
 
-        add(tabs, accordion, grid);
+        HorizontalLayout badges = new HorizontalLayout();
+        Badge pending = new Badge(getTranslation("components.status.pending"));
+
+        Badge confirmed = new Badge(getTranslation("components.status.confirmed"));
+        confirmed.addThemeVariants(BadgeVariant.SUCCESS);
+
+        Badge warning = new Badge(getTranslation("components.status.warning"));
+        warning.addThemeVariants(BadgeVariant.WARNING);
+
+        Badge denied = new Badge(getTranslation("components.status.denied"));
+        denied.addThemeVariants(BadgeVariant.ERROR);
+        badges.add(pending, confirmed, warning, denied);
+
+        add(tabs, accordion, grid, badges);
     }
 
     public static class Person {

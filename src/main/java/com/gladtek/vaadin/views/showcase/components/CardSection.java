@@ -14,7 +14,7 @@ public class CardSection extends VerticalLayout {
         setPadding(false);
         setSpacing(true);
 
-        Image mediaImage = new Image("https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80", "Snowy Landscape");
+        Image mediaImage = new Image("https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80", getTranslation("components.card.image.alt"));
         mediaImage.setWidth("100%");
         mediaImage.setHeight("150px");
         mediaImage.getStyle().set("object-fit", "cover");

@@ -31,6 +31,7 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
 
         tabs.setWidthFull();
 
+        Tab experimentalTab = new Tab(getTranslation("components.tab.experimental"));
         Tab inputTab = new Tab(getTranslation("components.tab.inputs"));
         Tab buttonTab = new Tab(getTranslation("components.tab.buttons"));
         Tab selectionTab = new Tab(getTranslation("components.tab.selection"));
@@ -38,7 +39,7 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
         Tab cardTab = new Tab(getTranslation("components.tab.card"));
         Tab dialogTab = new Tab(getTranslation("components.tab.dialogs"));
 
-        tabs.add(inputTab, buttonTab, selectionTab, displayTab, cardTab, dialogTab);
+        tabs.add(experimentalTab, inputTab, buttonTab, selectionTab, displayTab, cardTab, dialogTab);
 
         // Configure responsive container
         contentContainer.setFlexWrap(FlexLayout.FlexWrap.WRAP);
@@ -46,6 +47,7 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
         contentContainer.setSizeFull();
 
         // Create contents using new component classes
+        ExperimentalSection experimentalSection = new ExperimentalSection();
         InputSection inputSection = new InputSection();
         ButtonSection buttonSection = new ButtonSection();
         SelectionSection selectionSection = new SelectionSection();
@@ -54,6 +56,7 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
         DialogSection dialogSection = new DialogSection();
 
         // Style sections (keep some styling but ensure they fill space in single view)
+        styleSection(experimentalSection);
         styleSection(inputSection);
         styleSection(buttonSection);
         styleSection(selectionSection);
@@ -66,6 +69,7 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
 
         TabSheet tabSheet = new TabSheet();
         tabSheet.setSizeFull();
+        tabSheet.add(getTranslation("components.tab.experimental"),experimentalSection);
         tabSheet.add(getTranslation("components.tab.inputs"),inputSection);
         tabSheet.add(getTranslation("components.tab.buttons"), buttonSection);
         tabSheet.add(getTranslation("components.tab.selection"), selectionSection);
