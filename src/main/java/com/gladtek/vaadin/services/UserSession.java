@@ -1,9 +1,11 @@
 package com.gladtek.vaadin.services;
 
+import com.vaadin.flow.signals.local.ValueSignal;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 @Service
 @VaadinSessionScope
@@ -11,7 +13,8 @@ public class UserSession implements Serializable {
 
     private String selectedSide;
     private String intendedRoute;
-    private String profileName; // Persist profile name across UI refreshes
+    private String profileName;
+    private final ValueSignal<Locale> localeSignal = new ValueSignal<>(Locale.ENGLISH);
 
     public String getSelectedSide() {
         return selectedSide;
@@ -35,5 +38,9 @@ public class UserSession implements Serializable {
 
     public void setProfileName(String profileName) {
         this.profileName = profileName;
+    }
+
+    public ValueSignal<Locale> getLocaleSignal() {
+        return localeSignal;
     }
 }

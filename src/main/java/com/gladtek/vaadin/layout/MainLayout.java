@@ -64,7 +64,7 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
 
         SchemeToggle schemeToggle = new SchemeToggle(userSession);
 
-        LanguageSwitcher languageSwitcher = new LanguageSwitcher();
+        LanguageSwitcher languageSwitcher = new LanguageSwitcher(userSession);
 
         profileName = new Span();
         profileName.addClassName("profile-name");

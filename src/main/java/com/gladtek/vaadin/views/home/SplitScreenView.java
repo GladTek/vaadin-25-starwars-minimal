@@ -4,6 +4,7 @@ import com.gladtek.vaadin.components.LanguageSwitcher;
 import com.gladtek.vaadin.services.AllianceRegistry;
 import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.util.LanguageHelper;
+import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
@@ -11,21 +12,23 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 
-@Route("")
-public class SplitScreenView extends HorizontalLayout implements LocaleChangeObserver, HasDynamicTitle {
+import java.util.Locale;
 
-    private final H1 darkTitle;
-    private final Paragraph darkDesc;
-    private final H1 lightTitle;
-    private final Paragraph lightDesc;
+@Route("")
+public class SplitScreenView extends HorizontalLayout implements HasDynamicTitle {
+
+    private final H1 darkTitle = new H1();
+    private final Paragraph darkDesc = new Paragraph();
+    private final H1 lightTitle = new H1();
+    private final Paragraph lightDesc = new Paragraph();
     private final AllianceRegistry allianceRegistry;
+    private final UserSession userSession;
 
     public SplitScreenView(UserSession userSession, AllianceRegistry allianceRegistry) {
+        this.userSession = userSession;
         this.allianceRegistry = allianceRegistry;
         setSizeFull();
         setSpacing(false);
@@ -33,22 +36,20 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
 
         Main mainContent = new Main();
         mainContent.setSizeFull();
-        mainContent.getStyle().set("display", "flex"); // Ensure it behaves like a flex container if needed, but HorizontalLayout is better
+        mainContent.getStyle().set("display", "flex");
         
         HorizontalLayout splitLayout = new HorizontalLayout();
         splitLayout.setSizeFull();
         splitLayout.setSpacing(false);
         splitLayout.setPadding(false);
 
-        LanguageSwitcher languageSwitcher = new LanguageSwitcher();
+        LanguageSwitcher languageSwitcher = new LanguageSwitcher(userSession);
         languageSwitcher.getStyle().set("position", "absolute");
         languageSwitcher.getStyle().set("top", "20px");
         languageSwitcher.getStyle().set("right", "20px");
         languageSwitcher.getStyle().set("z-index", "10");
-        add(languageSwitcher); // Switcher stays outside main or inside? Usually outside is fine or inside main.
+        add(languageSwitcher);
 
-        darkTitle = new H1();
-        darkDesc = new Paragraph();
         VerticalLayout darkSide = createSide(
                 "dark",
                 "#1a1a1a",
@@ -56,12 +57,9 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
                 "images/dark-side.png",
                 "Lego Darth Vader",
                 darkTitle,
-                darkDesc,
-                userSession
+                darkDesc
         );
 
-        lightTitle = new H1();
-        lightDesc = new Paragraph();
         VerticalLayout lightSide = createSide(
                 "light",
                 "#ffffff",
@@ -69,8 +67,7 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
                 "images/light-side.png",
                 "Lego Luke Skywalker",
                 lightTitle,
-                lightDesc,
-                userSession
+                lightDesc
         );
 
         splitLayout.add(darkSide, lightSide);
@@ -80,10 +77,27 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
         mainContent.add(splitLayout);
         add(mainContent);
 
-        updateTexts();
+        // Signal-based bindings
+        darkTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "split.dark.title")));
+        darkDesc.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "split.dark.desc")));
+        lightTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "split.light.title")));
+        lightDesc.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "split.light.desc")));
+        
+        // Signal-based page title AND UI direction
+        com.vaadin.flow.signals.Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            UI.getCurrent().getPage().setTitle(getTranslation(l, "app.title"));
+            
+            // Reactive Direction Binding
+            if (LanguageHelper.isRtl(l)) {
+                UI.getCurrent().setDirection(Direction.RIGHT_TO_LEFT);
+            } else {
+                UI.getCurrent().setDirection(Direction.LEFT_TO_RIGHT);
+            }
+        });
     }
 
-    private VerticalLayout createSide(String sideKey, String bgColor, String textColor, String imagePath, String imageAlt, H1 title, Paragraph desc, UserSession userSession) {
+    private VerticalLayout createSide(String sideKey, String bgColor, String textColor, String imagePath, String imageAlt, H1 title, Paragraph desc) {
         VerticalLayout side = new VerticalLayout();
         side.addClassName("split-side");
         side.setSizeFull();
@@ -93,17 +107,13 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
         side.setAlignItems(Alignment.CENTER);
 
         side.addClickListener(e -> {
-            // Check if side is changing to reset persona
             if (!sideKey.equalsIgnoreCase(userSession.getSelectedSide())) {
                 userSession.setProfileName(null);
             }
             userSession.setSelectedSide(sideKey);
             
-            // Pure Java Session Identity: Use strictly the HttpSession ID
             UI ui = UI.getCurrent();
             String sessionId = ui.getSession().getSession().getId();
-
-            // Save the persona assigned by the registry into the session
             String persona = allianceRegistry.registerOrUpdate(sessionId, sideKey, userSession.getProfileName());
             userSession.setProfileName(persona);
             
@@ -124,7 +134,7 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
         image.getStyle().set("border-radius", "10px");
 
         title.addClassName("split-text");
-        title.getStyle().set("color", textColor); // Ensure title inherits text color if explicitly set
+        title.getStyle().set("color", textColor);
 
         desc.addClassName("split-text");
         desc.getStyle().set("text-align", "center");
@@ -135,26 +145,7 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
     }
 
     @Override
-    public void localeChange(LocaleChangeEvent event) {
-        /** This is the case of updating texts without reloading the page.
-        Useful when we do not have a lot of references to update**/
-        updateTexts();
-
-        if (LanguageHelper.isRtl(event.getLocale())) {
-            getUI().ifPresent(ui -> ui.setDirection(com.vaadin.flow.component.Direction.RIGHT_TO_LEFT));
-        } else {
-            getUI().ifPresent(ui -> ui.setDirection(com.vaadin.flow.component.Direction.LEFT_TO_RIGHT));
-        }
-    }
-
-    private void updateTexts() {
-        darkTitle.setText(getTranslation("split.dark.title"));
-        darkDesc.setText(getTranslation("split.dark.desc"));
-        lightTitle.setText(getTranslation("split.light.title"));
-        lightDesc.setText(getTranslation("split.light.desc"));
-    }
-    @Override
     public String getPageTitle() {
-        return getTranslation("app.title");
+        return getTranslation(userSession.getLocaleSignal().peek(), "app.title");
     }
 }
