@@ -3,7 +3,7 @@ package com.gladtek.vaadin.services;
 import com.gladtek.vaadin.models.Planet;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import com.vaadin.flow.signals.local.ValueSignal;
+import com.vaadin.flow.signals.shared.SharedValueSignal;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,30 +12,30 @@ import java.util.List;
 public class PlanetService {
 
     private final List<Planet> planets = Arrays.asList(
-            new Planet("Tatooine", "Arid", "Desert", new ValueSignal<>("200000"), new ValueSignal<>(0)),
-            new Planet("Alderaan", "Temperate", "Grasslands, Mountains", new ValueSignal<>("2000000000"), new ValueSignal<>(0)),
-            new Planet("Yavin IV", "Temperate, Tropical", "Jungle, Rainforests", new ValueSignal<>("1000"), new ValueSignal<>(0)),
-            new Planet("Hoth", "Frozen", "Tundra, Ice Caves", new ValueSignal<>("Unknown"), new ValueSignal<>(0)),
-            new Planet("Dagobah", "Murky", "Swamp, Jungles", new ValueSignal<>("Unknown"), new ValueSignal<>(0)),
-            new Planet("Bespin", "Temperate", "Gas Giant", new ValueSignal<>("6000000"), new ValueSignal<>(0)),
-            new Planet("Endor", "Temperate", "Forests, Mountains, Lakes", new ValueSignal<>("Unknown"), new ValueSignal<>(0)),
-            new Planet("Naboo", "Temperate", "Grassy Hills, Swamps, Forests, Mountains", new ValueSignal<>("4500000000"), new ValueSignal<>(0)),
-            new Planet("Coruscant", "Temperate", "Cityscape, Mountains", new ValueSignal<>("1000000000000"), new ValueSignal<>(0)),
-            new Planet("Kamino", "Temperate", "Ocean", new ValueSignal<>("1000000000"), new ValueSignal<>(0))
+            new Planet("Tatooine", "Arid", "Desert", new SharedValueSignal<>("200000"), new SharedValueSignal<>(0)),
+            new Planet("Alderaan", "Temperate", "Grasslands, Mountains", new SharedValueSignal<>("2000000000"), new SharedValueSignal<>(0)),
+            new Planet("Yavin IV", "Temperate, Tropical", "Jungle, Rainforests", new SharedValueSignal<>("1000"), new SharedValueSignal<>(0)),
+            new Planet("Hoth", "Frozen", "Tundra, Ice Caves", new SharedValueSignal<>("Unknown"), new SharedValueSignal<>(0)),
+            new Planet("Dagobah", "Murky", "Swamp, Jungles", new SharedValueSignal<>("Unknown"), new SharedValueSignal<>(0)),
+            new Planet("Bespin", "Temperate", "Gas Giant", new SharedValueSignal<>("6000000"), new SharedValueSignal<>(0)),
+            new Planet("Endor", "Temperate", "Forests, Mountains, Lakes", new SharedValueSignal<>("Unknown"), new SharedValueSignal<>(0)),
+            new Planet("Naboo", "Temperate", "Grassy Hills, Swamps, Forests, Mountains", new SharedValueSignal<>("4500000000"), new SharedValueSignal<>(0)),
+            new Planet("Coruscant", "Temperate", "Cityscape, Mountains", new SharedValueSignal<>("1000000000000"), new SharedValueSignal<>(0)),
+            new Planet("Kamino", "Temperate", "Ocean", new SharedValueSignal<>("1000000000"), new SharedValueSignal<>(0))
     );
 
-    private final ValueSignal<Long> totalPopulationSignal = new ValueSignal<>(calculateBaseTotalPopulation());
-    private final ValueSignal<Integer> totalPopulationTrendSignal = new ValueSignal<>(0);
+    private final SharedValueSignal<Long> totalPopulationSignal = new SharedValueSignal<>(calculateBaseTotalPopulation());
+    private final SharedValueSignal<Integer> totalPopulationTrendSignal = new SharedValueSignal<>(0);
 
     private long calculateBaseTotalPopulation() {
         return planets.stream().mapToLong(p -> parsePopulation(p.populationSignal().peek())).sum();
     }
 
-    public ValueSignal<Long> getTotalPopulationSignal() {
+    public SharedValueSignal<Long> getTotalPopulationSignal() {
         return totalPopulationSignal;
     }
 
-    public ValueSignal<Integer> getTotalPopulationTrendSignal() {
+    public SharedValueSignal<Integer> getTotalPopulationTrendSignal() {
         return totalPopulationTrendSignal;
     }
 
