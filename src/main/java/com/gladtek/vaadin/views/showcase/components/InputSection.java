@@ -1,7 +1,7 @@
 package com.gladtek.vaadin.views.showcase.components;
 
+import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.utils.DatePickerI18nUtil;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -10,12 +10,23 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.signals.Signal;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 public class InputSection extends VerticalLayout {
 
-    public InputSection() {
+    private final UserSession userSession;
+    private final TextField textField;
+    private final TextArea textArea;
+    private final PasswordField passwordField;
+    private final EmailField emailField;
+    private final DatePicker datePicker;
+    private final TimePicker timePicker;
+
+    public InputSection(UserSession userSession) {
+        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
         setWidthFull();
@@ -25,30 +36,44 @@ public class InputSection extends VerticalLayout {
         layout.getStyle().set("gap", "20px");
         layout.setWidthFull();
 
-        TextField textField = new TextField(getTranslation("components.input.textfield"));
+        textField = new TextField();
         styleField(textField);
 
-        TextArea textArea = new TextArea(getTranslation("components.input.textarea"));
+        textArea = new TextArea();
         styleField(textArea);
 
-        PasswordField passwordField = new PasswordField(getTranslation("components.input.password"));
+        passwordField = new PasswordField();
         styleField(passwordField);
 
-        EmailField emailField = new EmailField(getTranslation("components.input.email"));
+        emailField = new EmailField();
         styleField(emailField);
 
-        DatePicker datePicker = new DatePicker(getTranslation("components.input.date"), LocalDate.now());
-        DatePicker.DatePickerI18n i18n = DatePickerI18nUtil.getI18n(UI.getCurrent().getLocale());
-        i18n.setToday(getTranslation("components.datepicker.today"));
-        i18n.setCancel(getTranslation("components.datepicker.cancel"));
-        datePicker.setI18n(i18n);
+        datePicker = new DatePicker(LocalDate.now());
         styleField(datePicker);
 
-        TimePicker timePicker = new TimePicker(getTranslation("components.input.time"));
+        timePicker = new TimePicker();
         styleField(timePicker);
 
         layout.add(textField, textArea, passwordField, emailField, datePicker, timePicker);
         add(layout);
+
+        Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            
+            textField.setLabel(getTranslation(l, "components.input.textfield"));
+            textArea.setLabel(getTranslation(l, "components.input.textarea"));
+            passwordField.setLabel(getTranslation(l, "components.input.password"));
+            emailField.setLabel(getTranslation(l, "components.input.email"));
+            
+            datePicker.setLabel(getTranslation(l, "components.input.date"));
+            DatePicker.DatePickerI18n i18n = DatePickerI18nUtil.getI18n(l);
+            i18n.setToday(getTranslation(l, "components.datepicker.today"));
+            i18n.setCancel(getTranslation(l, "components.datepicker.cancel"));
+            datePicker.setI18n(i18n);
+
+            timePicker.setLabel(getTranslation(l, "components.input.time"));
+            timePicker.setLocale(l);
+        });
     }
 
     private void styleField(com.vaadin.flow.component.Component field) {

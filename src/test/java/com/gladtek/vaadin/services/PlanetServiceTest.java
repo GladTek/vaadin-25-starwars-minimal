@@ -77,8 +77,8 @@ class PlanetServiceTest {
     void testGetTop5Populated_SortedDescending() {
         List<Planet> top5 = planetService.getTop5Populated();
         for (int i = 0; i < top5.size() - 1; i++) {
-            long current = planetService.parsePopulation(top5.get(i).population());
-            long next = planetService.parsePopulation(top5.get(i + 1).population());
+            long current = planetService.parsePopulation(top5.get(i).populationSignal().peek());
+            long next = planetService.parsePopulation(top5.get(i + 1).populationSignal().peek());
             assertTrue(current >= next, "Top 5 should be sorted in descending order");
         }
     }

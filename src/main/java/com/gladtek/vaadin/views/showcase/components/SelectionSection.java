@@ -1,5 +1,6 @@
 package com.gladtek.vaadin.views.showcase.components;
 
+import com.gladtek.vaadin.services.UserSession;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -8,41 +9,70 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.signals.Signal;
+
+import java.util.Locale;
 
 public class SelectionSection extends VerticalLayout {
 
-    public SelectionSection() {
+    private final UserSession userSession;
+    private final ComboBox<String> comboBox;
+    private final Select<String> select;
+    private final Checkbox checkbox;
+    private final RadioButtonGroup<String> radioGroup;
+
+    public SelectionSection(UserSession userSession) {
+        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 
         HorizontalLayout row1 = new HorizontalLayout();
 
-        ComboBox<String> comboBox = new ComboBox<>(getTranslation("components.select.combobox"));
-        comboBox.setItems(getTranslation("components.select.option1"), getTranslation("components.select.option2"), getTranslation("components.select.option3"));
-        comboBox.setValue(getTranslation("components.select.option1"));
+        comboBox = new ComboBox<>();
+        comboBox.setItems("components.select.option1", "components.select.option2", "components.select.option3");
+        comboBox.setItemLabelGenerator(key -> getTranslation(userSession.getLocaleSignal().peek(), key));
+        comboBox.setValue("components.select.option1");
 
-        Select<String> select = new Select<>();
-        select.setLabel(getTranslation("components.select.select"));
-        select.setItems(getTranslation("components.select.optionA"), getTranslation("components.select.optionB"), getTranslation("components.select.optionC"));
-        select.setRenderer(new ComponentRenderer<>(option -> {
-            Span span = new Span(option);
+        select = new Select<>();
+        select.setItems("components.select.optionA", "components.select.optionB", "components.select.optionC");
+        select.setRenderer(new ComponentRenderer<>(key -> {
+            Span span = new Span(getTranslation(userSession.getLocaleSignal().peek(), key));
             return span;
         }));
-        select.setValue(getTranslation("components.select.optionA"));
+        select.setValue("components.select.optionA");
 
         row1.add(comboBox, select);
 
         HorizontalLayout row2 = new HorizontalLayout();
-        Checkbox checkbox = new Checkbox(getTranslation("components.select.checkbox"));
+        checkbox = new Checkbox();
         checkbox.setValue(true);
 
-        RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
-        radioGroup.setLabel(getTranslation("components.select.radiogroup"));
-        radioGroup.setItems(getTranslation("components.select.option1"), getTranslation("components.select.option2"), getTranslation("components.select.option3"));
-        radioGroup.setValue(getTranslation("components.select.option1"));
+        radioGroup = new RadioButtonGroup<>();
+        radioGroup.setItems("components.select.option1", "components.select.option2", "components.select.option3");
+        radioGroup.setItemLabelGenerator(key -> getTranslation(userSession.getLocaleSignal().peek(), key));
+        radioGroup.setValue("components.select.option1");
 
         row2.add(checkbox, radioGroup);
 
         add(row1, row2);
+
+        // Reactive bindings
+        Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            
+            comboBox.setLabel(getTranslation(l, "components.select.combobox"));
+            // Force redraw of items
+            comboBox.getListDataView().refreshAll();
+
+            select.setLabel(getTranslation(l, "components.select.select"));
+            // Force redraw of renderer
+            select.getListDataView().refreshAll();
+
+            checkbox.setLabel(getTranslation(l, "components.select.checkbox"));
+
+            radioGroup.setLabel(getTranslation(l, "components.select.radiogroup"));
+            // Force redraw of items
+            radioGroup.getListDataView().refreshAll();
+        });
     }
 }

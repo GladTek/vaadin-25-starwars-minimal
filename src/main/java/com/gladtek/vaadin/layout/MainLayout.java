@@ -1,6 +1,5 @@
 package com.gladtek.vaadin.layout;
 
-
 import com.gladtek.vaadin.components.AlliancePresence;
 import com.gladtek.vaadin.components.LanguageSwitcher;
 import com.gladtek.vaadin.components.SchemeToggle;
@@ -27,15 +26,14 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.RouteConfiguration;
+import com.vaadin.flow.signals.Signal;
 
+import java.util.Locale;
 
-
-public class MainLayout extends AppLayout implements LocaleChangeObserver, BeforeEnterObserver {
+public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
     private final UserSession userSession;
     private final AllianceRegistry allianceRegistry;
@@ -51,20 +49,22 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
     public MainLayout(UserSession userSession, AllianceRegistry allianceRegistry) {
         this.userSession = userSession;
         this.allianceRegistry = allianceRegistry;
+        
         createHeader();
         createDrawer();
+        
+        // Universal Reactive Bindings
+        setupReactiveBindings();
     }
 
-
     private void createHeader() {
-        logo = new H1(getTranslation("app.title"));
+        logo = new H1();
         logo.getStyle().set("white-space", "nowrap")
              .set("font-size", "var(--lumo-font-size-xl)")
              .set("margin", "0");
 
         SchemeToggle schemeToggle = new SchemeToggle(userSession);
-
-        LanguageSwitcher languageSwitcher = new LanguageSwitcher();
+        LanguageSwitcher languageSwitcher = new LanguageSwitcher(userSession);
 
         profileName = new Span();
         profileName.addClassName("profile-name");
@@ -77,14 +77,12 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
         AlliancePresence alliancePresence = new AlliancePresence(allianceRegistry);
         alliancePresence.getStyle().set("margin-right", "1rem");
 
-        // Group all presence and action components on the right side
         HorizontalLayout rightSide = new HorizontalLayout();
         rightSide.getStyle().set("margin-left", "auto");
         rightSide.setAlignItems(FlexComponent.Alignment.CENTER);
         rightSide.setPadding(false);
         rightSide.setSpacing(true);
 
-        // Profile & Stats (Order: Avatars/Counts -> Name -> Switches)
         rightSide.add(alliancePresence, profileName, schemeToggle, languageSwitcher);
 
         HorizontalLayout headerLayout = new HorizontalLayout();
@@ -114,20 +112,41 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
         footerNav.addItem(logoutItem);
         footerNav.setWidthFull();
 
-        updateLabels();
-
         Scroller scroller = new Scroller(nav);
         addToDrawer(scroller, footerNav);
+    }
+
+    private void setupReactiveBindings() {
+        // Bind Logo
+        logo.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "app.title")));
+        
+        // Signal Effect for Global Labels & Direction
+        Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            
+            // SideNav Labels
+            nav.setLabel(getTranslation(l, "nav.main"));
+            footerNav.setLabel(getTranslation(l, "nav.footer"));
+            
+            // SideNav Items
+            dashboardItem.setLabel(getTranslation(l, "nav.dashboard"));
+            planetsItem.setLabel(getTranslation(l, "nav.planets"));
+            componentsItem.setLabel(getTranslation(l, "nav.components"));
+            logoutItem.setLabel(getTranslation(l, "nav.logout"));
+            
+            // Global UI Direction
+            getUI().ifPresent(ui -> {
+                Direction dir = LanguageHelper.isRtl(l) ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT;
+                ui.setDirection(dir);
+            });
+        });
     }
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         UI ui = attachEvent.getUI();
-        // Pure Java Session Identity: No tab-specific IDs, no JavaScript hooks
         String sessionId = ui.getSession().getSession().getId();
-        
-        // Bind the profile name after attachment
         profileName.bindText(allianceRegistry.getMyProfileName(sessionId));
     }
 
@@ -149,59 +168,34 @@ public class MainLayout extends AppLayout implements LocaleChangeObserver, Befor
         
         if (side == null) {
             String path = event.getLocation().getPathWithQueryParameters();
-            // Avoid saving the redirect target itself or loop
             if (!path.isEmpty() && !path.equals(RouteConfiguration.forSessionScope().getUrl(SplitScreenView.class))) {
                 userSession.setIntendedRoute(path);
             }
             event.rerouteTo(SplitScreenView.class);
         } else {
             String sessionId = ui.getSession().getSession().getId();
-            // Unified session tracking (Java Reference Counting)
             allianceRegistry.registerOrUpdate(sessionId, side, userSession.getProfileName());
             
-            // Galactic Presence: Update which page this session is currently browsing
-            String pageName = getPageTitleFor(event.getNavigationTarget());
+            String pageName = getPageTitleFor(event.getNavigationTarget(), userSession.getLocaleSignal().peek());
             allianceRegistry.updateCurrentPage(sessionId, pageName);
         }
     }
 
-    private String getPageTitleFor(Class<?> viewClass) {
+    private String getPageTitleFor(Class<?> viewClass, Locale locale) {
         if (viewClass == null) return "Galaxy Map";
-        if (viewClass.equals(DashboardView.class)) return getTranslation("nav.dashboard");
-        if (viewClass.equals(PlanetsView.class)) return getTranslation("nav.planets");
-        if (viewClass.equals(ComponentsView.class)) return getTranslation("nav.components");
+        if (viewClass.equals(DashboardView.class)) return getTranslation(locale, "nav.dashboard");
+        if (viewClass.equals(PlanetsView.class)) return getTranslation(locale, "nav.planets");
+        if (viewClass.equals(ComponentsView.class)) return getTranslation(locale, "nav.components");
         return viewClass.getSimpleName();
     }
 
     @Override
     protected void onDetach(com.vaadin.flow.component.DetachEvent detachEvent) {
         super.onDetach(detachEvent);
-        // Clean up registry for this specific tab using Java reference counting
         UI ui = detachEvent.getUI();
         if (ui != null) {
             String sessionId = ui.getSession().getSession().getId();
             allianceRegistry.unregister(sessionId);
         }
-    }
-
-    @Override
-    public void localeChange(LocaleChangeEvent localeChangeEvent) {
-        if (LanguageHelper.isRtl(localeChangeEvent.getLocale())) {
-            localeChangeEvent.getUI().setDirection(Direction.RIGHT_TO_LEFT);
-        } else {
-            localeChangeEvent.getUI().setDirection(Direction.LEFT_TO_RIGHT);
-        }
-        updateLabels();
-    }
-
-    private void updateLabels() {
-        logo.setText(getTranslation("app.title"));
-        nav.setLabel(getTranslation("nav.main"));
-        dashboardItem.setLabel(getTranslation("nav.dashboard"));
-        planetsItem.setLabel(getTranslation("nav.planets"));
-        componentsItem.setLabel(getTranslation("nav.components"));
-        
-        footerNav.setLabel(getTranslation("nav.footer"));
-        logoutItem.setLabel(getTranslation("nav.logout"));
     }
 }

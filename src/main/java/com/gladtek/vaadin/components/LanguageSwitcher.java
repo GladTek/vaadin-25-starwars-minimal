@@ -1,7 +1,6 @@
 package com.gladtek.vaadin.components;
 
-import com.gladtek.vaadin.util.LanguageHelper;
-import com.vaadin.flow.component.Direction;
+import com.gladtek.vaadin.services.UserSession;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.select.Select;
@@ -11,7 +10,7 @@ import java.util.Locale;
 
 public class LanguageSwitcher extends Select<Locale> {
 
-    public LanguageSwitcher() {
+    public LanguageSwitcher(UserSession userSession) {
         super();
 
         Locale arabic = Locale.forLanguageTag("ar");
@@ -32,13 +31,12 @@ public class LanguageSwitcher extends Select<Locale> {
         addValueChangeListener(event -> {
             Locale selectedLocale = event.getValue();
             if (selectedLocale != null) {
+                // Update modern Signal - UI direction is now handled reactively by a Signal.effect
+                userSession.getLocaleSignal().set(selectedLocale);
+                
+                // Update legacy framework locale
                 UI.getCurrent().setLocale(selectedLocale);
                 UI.getCurrent().getSession().setLocale(selectedLocale);
-                if (LanguageHelper.isRtl(selectedLocale)) {
-                    UI.getCurrent().setDirection(Direction.RIGHT_TO_LEFT);
-                } else {
-                    UI.getCurrent().setDirection(Direction.LEFT_TO_RIGHT);
-                }
             }
         });
 
