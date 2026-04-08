@@ -1,5 +1,12 @@
 # Vaadin 25 Star Wars Demo Application
 
+![GitHub Release](https://img.shields.io/github/v/release/GladTek/vaadin-25-starwars-minimal?color=blue&label=version)
+![License](https://img.shields.io/github/license/GladTek/vaadin-25-starwars-minimal?color=green)
+![Java Version](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
+![Vaadin Version](https://img.shields.io/badge/Vaadin-25.1.1-blueviolet?logo=vaadin)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.5-brightgreen?logo=springboot&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-Built_with-646CFF?logo=vite&logoColor=white)
+
 A modern small demo application built with Vaadin 25 and Spring Boot, demonstrating advanced UI concepts, dynamic scheming dark/light mode, and full internationalization within a Star Wars-themed context.
 
 
