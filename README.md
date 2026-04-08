@@ -35,12 +35,13 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 *   **Planets**:
     *   Interactive data grid displaying Star Wars planets.
     *   **Master-Detail View**: Select a planet to see full details in a split-view layout.
+    *   **Real-time Reactivity**: Leverages **Vaadin Signals** for live population updates across the dashboard and planet screens.
     *   **Localized Data**: Planet names, climates, and terrains are fully translated.
 *   **Components Showcase**: A comprehensive gallery of customized Vaadin components:
     *   **Inputs**: Text fields, date pickers (with localized "Today"/"Cancel" buttons), time pickers.
     *   **Cards**: Standard cards and advanced variants with media images, badges, and footer actions.
     *   **Display**: Grids, Tabs, Accordions, and Dialogs.
-+    *   **Experimental**: Showcases upcoming Vaadin features like **Badges**, **Sliders**, and **RangeSliders** (enabled via feature flags).
+    *   **Experimental**: Showcases upcoming Vaadin features like **Badges**, **Sliders**, and **RangeSliders** (enabled via feature flags).
 
 ### Internationalization (i18n)
 *   **Multi-language Support**: Full support for **English**, **French**, **German**, and **Arabic**.
@@ -49,6 +50,7 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 
 ### Theming & UX
 *   **Side-based Styling**: The application's visual density and color palette adapt based on the user's initial "Light" or "Dark" side selection.
+*   **Dynamic Trend Indicators**: Population numbers dynamically shift to **Green** (increase) or **Red** (decrease) in real-time.
 *   **404 Page**: A custom, localized "Page Not Found" experience that guides users back to safety.
 
 ---
@@ -69,7 +71,12 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 *   **Security & Routing**:
     *   **Anonymous Access**: Views are annotated with `@AnonymousAllowed` (demo mode).
     *   **Route Guards**: `MainLayout` implements `BeforeEnterObserver` to intercept unauthenticated users (no side selected) and redirect them to the entry page, effectively protecting inner views while preserving deep links via `UserSession.intendedRoute`.
-    *   **Error Handling**: `NotFoundView` implements `HasErrorParameter<NotFoundException>` to catch and display 404 errors.
+    *   `NotFoundView`: Implements `HasErrorParameter<NotFoundException>` to catch and display 404 errors.
+*   **Signal State Management**:
+    *   **Full-Stack Reactivity**: Implements the new Vaadin Signals paradigm for efficient, real-time state synchronization between the server and client.
+    *   **Shared Signals**: Utilizes `SharedValueSignal` in `PlanetService` to ensure stable, session-isolated state sharing across multiple concurrent users.
+*   **Simulation Engine**:
+    *   A Spring-managed `@Scheduled` task in `PlanetService` simulates planetary population growth every 5 seconds, pushing updates to the UI via signals.
 
 ### Key Components & Utilities
 *   **`DatePickerI18nUtil`**: A specialized utility that generates `DatePicker.DatePickerI18n` configurations dynamically from the active `Locale`, handling specific formats (e.g., `ar-TN` for Arabic) and loading translation resources.
@@ -81,7 +88,9 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
     *   `DisplaySection`: Grids, Tabs, Accordions.
     *   `CardSection`: Standard and advanced Cards.
     *   `DialogSection`: Dialogs and Notifications.
-+    *   `ExperimentalSection`: Demonstrates experimental components (Slider, RangeSlider) and new Badge variants.
+    *   `ExperimentalSection`: Demonstrates experimental components (Slider, RangeSlider) and new Badge variants.
+*   **Monitoring & Analytics**:
+    *   **Rybbit Analytics**: Integrated support for monitoring user engagement and performance vitals, configurable via environment variables in production.
 
 ### Localization Structure
 *   Resources stored in `src/main/resources/vaadin-i18n/`.
