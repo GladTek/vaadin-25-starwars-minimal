@@ -86,15 +86,22 @@ public class PlanetDetail extends VerticalLayout {
         climate.setValue(translateList(currentPlanet.climate(), l));
         terrain.setValue(translateList(currentPlanet.terrain(), l));
         
-        if ("unknown".equalsIgnoreCase(currentPlanet.population())) {
+        String popStr = currentPlanet.populationSignal().get();
+        int trend = currentPlanet.trendSignal().get();
+        
+        population.getStyle().remove("--vaadin-input-field-value-color");
+        if (trend > 0) population.getStyle().set("--vaadin-input-field-value-color", "green");
+        else if (trend < 0) population.getStyle().set("--vaadin-input-field-value-color", "red");
+
+        if ("unknown".equalsIgnoreCase(popStr)) {
             population.setValue(getTranslation(l, "planet.term.unknown"));
         } else {
             try {
-                long pop = Long.parseLong(currentPlanet.population());
+                long pop = Long.parseLong(popStr);
                 Locale formatLocale = LanguageHelper.getFormattingLocale(l);
                 population.setValue(NumberFormat.getInstance(formatLocale).format(pop));
             } catch (NumberFormatException e) {
-                population.setValue(currentPlanet.population());
+                population.setValue(popStr);
             }
         }
     }

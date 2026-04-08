@@ -52,17 +52,31 @@ public class PlanetsView extends VerticalLayout implements HasDynamicTitle {
                 .setHeader("Terrain")
                 .setKey("terrain");
 
-        grid.addColumn(planet -> {
-                    if ("unknown".equalsIgnoreCase(planet.population())) {
-                        return getTranslation(userSession.getLocaleSignal().peek(), "planet.term.unknown");
-                    }
-                    try {
-                        long pop = Long.parseLong(planet.population());
-                        Locale formatLocale = LanguageHelper.getFormattingLocale(userSession.getLocaleSignal().peek());
-                        return NumberFormat.getInstance(formatLocale).format(pop);
-                    } catch (NumberFormatException e) {
-                        return planet.population();
-                    }
+        grid.addComponentColumn(planet -> {
+                    com.vaadin.flow.component.html.Span span = new com.vaadin.flow.component.html.Span();
+                    span.bindText(Signal.computed(() -> {
+                        String popStr = planet.populationSignal().get();
+                        Locale l = userSession.getLocaleSignal().get();
+                        if ("unknown".equalsIgnoreCase(popStr)) {
+                            return getTranslation(l, "planet.term.unknown");
+                        }
+                        try {
+                            long pop = Long.parseLong(popStr);
+                            Locale formatLocale = LanguageHelper.getFormattingLocale(l);
+                            return NumberFormat.getInstance(formatLocale).format(pop);
+                        } catch (NumberFormatException e) {
+                            return popStr;
+                        }
+                    }));
+                    
+                    Signal.effect(span, () -> {
+                        int trend = planet.trendSignal().get();
+                        if (trend > 0) span.getStyle().set("color", "green");
+                        else if (trend < 0) span.getStyle().set("color", "red");
+                        else span.getStyle().remove("color");
+                    });
+                    
+                    return span;
                 })
                 .setHeader("Population")
                 .setKey("population");

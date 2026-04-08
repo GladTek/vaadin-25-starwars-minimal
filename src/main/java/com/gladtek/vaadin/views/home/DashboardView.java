@@ -129,10 +129,27 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
                 .setHeader("Name")
                 .setKey("name");
 
-        top5Grid.addColumn(p -> {
-            long pop = planetService.parsePopulation(p.population());
-            Locale formatLocale = LanguageHelper.getFormattingLocale(userSession.getLocaleSignal().peek());
-            return NumberFormat.getInstance(formatLocale).format(pop);
+        top5Grid.addComponentColumn(p -> {
+            com.vaadin.flow.component.html.Span span = new com.vaadin.flow.component.html.Span();
+            span.bindText(Signal.computed(() -> {
+                String popStr = p.populationSignal().get();
+                Locale l = userSession.getLocaleSignal().get();
+                if ("unknown".equalsIgnoreCase(popStr)) {
+                    return getTranslation(l, "planet.term.unknown");
+                }
+                long pop = planetService.parsePopulation(popStr);
+                Locale formatLocale = LanguageHelper.getFormattingLocale(l);
+                return NumberFormat.getInstance(formatLocale).format(pop);
+            }));
+            
+            Signal.effect(span, () -> {
+                int trend = p.trendSignal().get();
+                if (trend > 0) span.getStyle().set("color", "green");
+                else if (trend < 0) span.getStyle().set("color", "red");
+                else span.getStyle().remove("color");
+            });
+
+            return span;
         }).setHeader("Population").setKey("population");
 
         layout.add(top5Title, top5Grid);
@@ -170,10 +187,19 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
         populationKpiTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.kpi.population")));
         
         // KPI Values
-        populationKpiValue.bindText(userSession.getLocaleSignal().map(l -> {
+        populationKpiValue.bindText(Signal.computed(() -> {
+            Locale l = userSession.getLocaleSignal().get();
+            long totalPop = planetService.getTotalPopulationSignal().get();
             Locale formatLocale = LanguageHelper.getFormattingLocale(l);
-            return NumberFormat.getInstance(formatLocale).format(planetService.getTotalPopulation());
+            return NumberFormat.getInstance(formatLocale).format(totalPop);
         }));
+
+        Signal.effect(this, () -> {
+            int trend = planetService.getTotalPopulationTrendSignal().get();
+            if (trend > 0) populationKpiValue.getStyle().set("color", "green");
+            else if (trend < 0) populationKpiValue.getStyle().set("color", "red");
+            else populationKpiValue.getStyle().set("color", "black");
+        });
 
         // Top 5 Section
         top5Title.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.top5.title")));

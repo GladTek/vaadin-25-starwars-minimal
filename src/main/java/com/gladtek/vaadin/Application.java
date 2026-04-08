@@ -9,6 +9,7 @@ import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.aura.Aura;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.vaadin.flow.component.page.Inline;
 import com.vaadin.flow.server.AppShellSettings;
@@ -16,6 +17,7 @@ import com.vaadin.flow.server.VaadinService;
 
 @Push
 @SpringBootApplication
+@EnableScheduling
 @StyleSheet(Aura.STYLESHEET)
 @StyleSheet("styles.css")
 @PWA(name = "Star Wars Demo", shortName = "Star Wars")
