@@ -11,6 +11,12 @@ vaadin:
   copilot:
     enable: true
 
+rybbit:
+  analytics:
+    enabled: false
+    site-id: ${RYBBIT_ANALYTICS_SITE_ID:RYBBIT-DEMO-ID}
+    script-url: ${RYBBIT_ANALYTICS_SCRIPT_URL:https://analytics.example.com/api/script.js}
+    enable-web-vitals: ${RYBBIT_ANALYTICS_ENABLE_WEB_VITALS:false}
 app:
   meta:
     og:

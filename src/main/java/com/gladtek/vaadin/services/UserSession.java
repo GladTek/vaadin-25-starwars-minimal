@@ -1,14 +1,17 @@
 package com.gladtek.vaadin.services;
 
-
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+import java.io.Serializable;
+
+@Service
 @VaadinSessionScope
-public class UserSession {
+public class UserSession implements Serializable {
+
     private String selectedSide;
     private String intendedRoute;
+    private String profileName; // Persist profile name across UI refreshes
 
     public String getSelectedSide() {
         return selectedSide;
@@ -24,5 +27,13 @@ public class UserSession {
 
     public void setIntendedRoute(String intendedRoute) {
         this.intendedRoute = intendedRoute;
+    }
+
+    public String getProfileName() {
+        return profileName;
+    }
+
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
     }
 }

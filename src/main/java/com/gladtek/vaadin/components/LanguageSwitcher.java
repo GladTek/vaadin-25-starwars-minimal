@@ -33,6 +33,7 @@ public class LanguageSwitcher extends Select<Locale> {
             Locale selectedLocale = event.getValue();
             if (selectedLocale != null) {
                 UI.getCurrent().setLocale(selectedLocale);
+                UI.getCurrent().getSession().setLocale(selectedLocale);
                 if (LanguageHelper.isRtl(selectedLocale)) {
                     UI.getCurrent().setDirection(Direction.RIGHT_TO_LEFT);
                 } else {

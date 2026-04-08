@@ -1,6 +1,7 @@
 package com.gladtek.vaadin.views.home;
 
 import com.gladtek.vaadin.components.LanguageSwitcher;
+import com.gladtek.vaadin.services.AllianceRegistry;
 import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.util.LanguageHelper;
 import com.vaadin.flow.component.UI;
@@ -22,8 +23,10 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
     private final Paragraph darkDesc;
     private final H1 lightTitle;
     private final Paragraph lightDesc;
+    private final AllianceRegistry allianceRegistry;
 
-    public SplitScreenView(UserSession userSession) {
+    public SplitScreenView(UserSession userSession, AllianceRegistry allianceRegistry) {
+        this.allianceRegistry = allianceRegistry;
         setSizeFull();
         setSpacing(false);
         setPadding(false);
@@ -90,14 +93,27 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
         side.setAlignItems(Alignment.CENTER);
 
         side.addClickListener(e -> {
+            // Check if side is changing to reset persona
+            if (!sideKey.equalsIgnoreCase(userSession.getSelectedSide())) {
+                userSession.setProfileName(null);
+            }
             userSession.setSelectedSide(sideKey);
-            getUI().ifPresent(ui -> {
+            
+            // Pure Java Session Identity: Use strictly the HttpSession ID
+            UI ui = UI.getCurrent();
+            String sessionId = ui.getSession().getSession().getId();
+
+            // Save the persona assigned by the registry into the session
+            String persona = allianceRegistry.registerOrUpdate(sessionId, sideKey, userSession.getProfileName());
+            userSession.setProfileName(persona);
+            
+            getUI().ifPresent(activeUi -> {
                 String intended = userSession.getIntendedRoute();
                 if (intended != null && !intended.isEmpty()) {
                     userSession.setIntendedRoute(null);
-                    ui.navigate(intended);
+                    activeUi.navigate(intended);
                 } else {
-                    ui.navigate(DashboardView.class);
+                    activeUi.navigate(DashboardView.class);
                 }
             });
         });
@@ -123,7 +139,6 @@ public class SplitScreenView extends HorizontalLayout implements LocaleChangeObs
         /** This is the case of updating texts without reloading the page.
         Useful when we do not have a lot of references to update**/
         updateTexts();
-        UI.getCurrent().getSession().setLocale(event.getLocale());
 
         if (LanguageHelper.isRtl(event.getLocale())) {
             getUI().ifPresent(ui -> ui.setDirection(com.vaadin.flow.component.Direction.RIGHT_TO_LEFT));

@@ -26,4 +26,10 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 COPY --from=build /javaruntime $JAVA_HOME
 COPY --from=build /app/target/*.jar app.jar
 
+# Rybbit Analytics Configuration (can be overridden at runtime)
+ENV RYBBIT_ANALYTICS_ENABLED=false
+ENV RYBBIT_ANALYTICS_SITE_ID=RYBBIT-DEMO-ID
+ENV RYBBIT_ANALYTICS_SCRIPT_URL=https://analytics.example.com/api/script.js
+ENV RYBBIT_ANALYTICS_ENABLE_WEB_VITALS=false
+
 ENTRYPOINT ["java", "-jar", "/app.jar", "--spring.profiles.active=prod"]
