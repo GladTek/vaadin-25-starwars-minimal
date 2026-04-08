@@ -56,8 +56,8 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 ## 2. Technical Overview
 
 ### Technology Stack
-*   **Framework**: Vaadin Flow 25.1.0
-*   **Backend**: Spring Boot 4.0.4 (Java 21)
+*   **Framework**: Vaadin Flow 25.1.1
+*   **Backend**: Spring Boot 4.0.5 (Java 21)
 *   **Build Tool**: Maven
 
 ### Architecture & Patterns
