@@ -1,5 +1,6 @@
 package com.gladtek.vaadin.views.showcase.components;
 
+import com.gladtek.vaadin.services.UserSession;
 import com.vaadin.flow.component.badge.Badge;
 import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.html.H3;
@@ -8,42 +9,77 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.slider.RangeSlider;
 import com.vaadin.flow.component.slider.RangeSliderValue;
 import com.vaadin.flow.component.slider.Slider;
+import com.vaadin.flow.signals.Signal;
+
+import java.util.Locale;
 
 public class ExperimentalSection extends VerticalLayout {
 
-    public ExperimentalSection() {
+    private final UserSession userSession;
+    private final H3 badgesTitle;
+    private final Badge pending;
+    private final Badge confirmed;
+    private final Badge warning;
+    private final Badge denied;
+
+    private final H3 slidersTitle;
+    private final Slider slider;
+    private final RangeSlider rangeSlider;
+    private final Slider sliderMinMax;
+
+    public ExperimentalSection(UserSession userSession) {
+        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 
-        H3 badgesTitle = new H3(getTranslation("components.badge.title"));
+        badgesTitle = new H3();
         HorizontalLayout badgesContainer = new HorizontalLayout();
-        Badge pending = new Badge(getTranslation("components.status.pending"));
-
-        Badge confirmed = new Badge(getTranslation("components.status.confirmed"));
+        
+        pending = new Badge();
+        confirmed = new Badge();
         confirmed.addThemeVariants(BadgeVariant.SUCCESS);
-
-        Badge warning = new Badge(getTranslation("components.status.warning"));
+        warning = new Badge();
         warning.addThemeVariants(BadgeVariant.WARNING);
-
-        Badge denied = new Badge(getTranslation("components.status.denied"));
+        denied = new Badge();
         denied.addThemeVariants(BadgeVariant.ERROR);
         badgesContainer.add(pending, confirmed, warning, denied);
 
-        H3 slidersTitle = new H3(getTranslation("components.sliders.title"));
-        Slider slider = new Slider(getTranslation("components.slider.volume"));
+        slidersTitle = new H3();
+        slider = new Slider();
         slider.setValue(50.0);
         
-        RangeSlider rangeSlider = new RangeSlider(getTranslation("components.slider.price_range"), 0, 1000);
+        rangeSlider = new RangeSlider();
+        rangeSlider.setMin(0);
+        rangeSlider.setMax(1000);
         rangeSlider.setValue(new RangeSliderValue(200, 800));
         rangeSlider.getElement().setAttribute("role", "group");
-        rangeSlider.getElement().setAttribute("aria-label", getTranslation("components.slider.price_range_aria"));
         add(rangeSlider);
 
-        Slider sliderMinMax = new Slider(getTranslation("components.slider.temperature"), 0, 100);
+        sliderMinMax = new Slider();
+        sliderMinMax.setMin(0);
+        sliderMinMax.setMax(100);
         sliderMinMax.setValue(50.0);
         sliderMinMax.setMinMaxVisible(true);
         add(sliderMinMax);
 
-        add(badgesTitle, badgesContainer,slidersTitle,slider,rangeSlider,sliderMinMax);
+        add(badgesTitle, badgesContainer, slidersTitle, slider, rangeSlider, sliderMinMax);
+
+        Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            
+            badgesTitle.setText(getTranslation(l, "components.badge.title"));
+            pending.setText(getTranslation(l, "components.status.pending"));
+            confirmed.setText(getTranslation(l, "components.status.confirmed"));
+            warning.setText(getTranslation(l, "components.status.warning"));
+            denied.setText(getTranslation(l, "components.status.denied"));
+
+            slidersTitle.setText(getTranslation(l, "components.sliders.title"));
+            slider.setLabel(getTranslation(l, "components.slider.volume"));
+            
+            rangeSlider.setLabel(getTranslation(l, "components.slider.price_range"));
+            rangeSlider.getElement().setAttribute("aria-label", getTranslation(l, "components.slider.price_range_aria"));
+            
+            sliderMinMax.setLabel(getTranslation(l, "components.slider.temperature"));
+        });
     }
 }

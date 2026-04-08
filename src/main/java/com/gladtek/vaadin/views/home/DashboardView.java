@@ -4,6 +4,8 @@ import com.gladtek.vaadin.layout.MainLayout;
 import com.gladtek.vaadin.models.Planet;
 import com.gladtek.vaadin.services.PlanetService;
 import com.gladtek.vaadin.services.UserSession;
+import com.gladtek.vaadin.util.LanguageHelper;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
@@ -11,16 +13,15 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.i18n.LocaleChangeObserver;
-import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.HasDynamicTitle;
+import com.vaadin.flow.signals.Signal;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 @Route(value = "dashboard", layout = MainLayout.class)
-public class DashboardView extends VerticalLayout implements LocaleChangeObserver, HasDynamicTitle {
+public class DashboardView extends VerticalLayout implements HasDynamicTitle {
 
     private final UserSession userSession;
     private final PlanetService planetService;
@@ -51,7 +52,14 @@ public class DashboardView extends VerticalLayout implements LocaleChangeObserve
         createKpiRow();
         createContentRow();
 
-        updateTexts();
+        // Reactive Bindings
+        setupReactiveBindings();
+
+        // Ensure title and grid are ready on arrival
+        addAttachListener(e -> {
+            updatePageTitle(userSession.getLocaleSignal().peek());
+            top5Grid.getDataProvider().refreshAll();
+        });
     }
 
     private void createKpiRow() {
@@ -67,7 +75,6 @@ public class DashboardView extends VerticalLayout implements LocaleChangeObserve
 
         VerticalLayout planetCard = new VerticalLayout(planetKpiTitle, planetKpiValue);
         styleCard(planetCard);
-        // Responsive sizing: Grow to fill, min-width to trigger wrap, width hint
         planetCard.getStyle().set("flex-grow", "1");
         planetCard.getStyle().set("min-width", "300px");
         planetCard.getStyle().set("width", "40%");
@@ -75,7 +82,7 @@ public class DashboardView extends VerticalLayout implements LocaleChangeObserve
         populationKpiTitle = new H2();
         populationKpiTitle.getStyle().set("margin", "0").set("font-size", "1.2rem");
 
-        populationKpiValue = new Span(NumberFormat.getInstance(Locale.ENGLISH).format(planetService.getTotalPopulation()));
+        populationKpiValue = new Span();
         populationKpiValue.getStyle().set("font-size", "2.5rem").set("font-weight", "bold");
 
         VerticalLayout popCard = new VerticalLayout(populationKpiTitle, populationKpiValue);
@@ -96,11 +103,10 @@ public class DashboardView extends VerticalLayout implements LocaleChangeObserve
 
         VerticalLayout top5Layout = new VerticalLayout();
         styleCard(top5Layout);
-        top5Layout.setPadding(false); // Grid handles padding
+        top5Layout.setPadding(false);
 
         top5Layout.add(createTop5Section());
         top5Layout.getStyle().set("flex-grow", "2");
-
 
         VerticalLayout featuredLayout = new VerticalLayout();
         styleCard(featuredLayout);
@@ -119,13 +125,14 @@ public class DashboardView extends VerticalLayout implements LocaleChangeObserve
         top5Grid.setItems(planetService.getTop5Populated());
         top5Grid.setAllRowsVisible(true);
 
-        top5Grid.addColumn(p -> getTranslation("planet.name." + p.name().toLowerCase().replace(" ", "_")))
+        top5Grid.addColumn(p -> getTranslation(userSession.getLocaleSignal().peek(), "planet.name." + p.name().toLowerCase().replace(" ", "_")))
                 .setHeader("Name")
                 .setKey("name");
 
         top5Grid.addColumn(p -> {
             long pop = planetService.parsePopulation(p.population());
-            return NumberFormat.getInstance(Locale.ENGLISH).format(pop);
+            Locale formatLocale = LanguageHelper.getFormattingLocale(userSession.getLocaleSignal().peek());
+            return NumberFormat.getInstance(formatLocale).format(pop);
         }).setHeader("Population").setKey("population");
 
         layout.add(top5Title, top5Grid);
@@ -139,69 +146,93 @@ public class DashboardView extends VerticalLayout implements LocaleChangeObserve
         layout.setAlignItems(Alignment.CENTER);
 
         featuredTitle = new H3();
-
-        Planet featured = planetService.getFeaturedPlanet();
-        featuredName = new H2(getTranslation("planet.name." + featured.name().toLowerCase().replace(" ", "_")));
+        featuredName = new H2();
 
         HorizontalLayout climateRow = new HorizontalLayout();
         featuredClimateLabel = new Span();
         featuredClimateLabel.getStyle().set("font-weight", "bold");
-        featuredClimateValue = new Span(translateList(featured.climate()));
+        featuredClimateValue = new Span();
         climateRow.add(featuredClimateLabel, new Span(": "), featuredClimateValue);
 
         HorizontalLayout terrainRow = new HorizontalLayout();
         featuredTerrainLabel = new Span();
         featuredTerrainLabel.getStyle().set("font-weight", "bold");
-        featuredTerrainValue = new Span(translateList(featured.terrain()));
+        featuredTerrainValue = new Span();
         terrainRow.add(featuredTerrainLabel, new Span(": "), featuredTerrainValue);
 
         layout.add(featuredTitle, featuredName, climateRow, terrainRow);
         return layout;
     }
 
-    private void styleCard(VerticalLayout card) {
-        card.setSpacing(true);
-    }
+    private void setupReactiveBindings() {
+        // KPI Titles
+        planetKpiTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.kpi.planets")));
+        populationKpiTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.kpi.population")));
+        
+        // KPI Values
+        populationKpiValue.bindText(userSession.getLocaleSignal().map(l -> {
+            Locale formatLocale = LanguageHelper.getFormattingLocale(l);
+            return NumberFormat.getInstance(formatLocale).format(planetService.getTotalPopulation());
+        }));
 
+        // Top 5 Section
+        top5Title.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.top5.title")));
 
-    @Override
-    public void localeChange(LocaleChangeEvent event) {
-        updateTexts();
-    }
+        // Featured Section Labels
+        featuredTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.featured.title")));
+        featuredClimateLabel.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.featured.climate")));
+        featuredTerrainLabel.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.featured.terrain")));
 
-    private void updateTexts() {
-        planetKpiTitle.setText(getTranslation("dashboard.kpi.planets"));
-        populationKpiTitle.setText(getTranslation("dashboard.kpi.population"));
-
-        top5Title.setText(getTranslation("dashboard.top5.title"));
-        top5Grid.getColumnByKey("name").setHeader(getTranslation("planets.col.name"));
-        top5Grid.getColumnByKey("population").setHeader(getTranslation("planets.col.population"));
-        top5Grid.getDataProvider().refreshAll();
-
-        featuredTitle.setText(getTranslation("dashboard.featured.title"));
-        featuredClimateLabel.setText(getTranslation("dashboard.featured.climate"));
-        featuredTerrainLabel.setText(getTranslation("dashboard.featured.terrain"));
-
+        // Featured Section Values
         Planet featured = planetService.getFeaturedPlanet();
-        featuredName.setText(getTranslation("planet.name." + featured.name().toLowerCase().replace(" ", "_")));
-        featuredClimateValue.setText(translateList(featured.climate()));
-        featuredTerrainValue.setText(translateList(featured.terrain()));
+        featuredName.bindText(userSession.getLocaleSignal().map(l -> 
+            getTranslation(l, "planet.name." + featured.name().toLowerCase().replace(" ", "_"))
+        ));
+        featuredClimateValue.bindText(userSession.getLocaleSignal().map(l -> translateList(featured.climate(), l)));
+        featuredTerrainValue.bindText(userSession.getLocaleSignal().map(l -> translateList(featured.terrain(), l)));
 
-        populationKpiValue.setText(NumberFormat.getInstance(Locale.ENGLISH).format(planetService.getTotalPopulation()));
+        // Signal Effect for Grid Headers, Data refresh and Page Title
+        Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            
+            // Update Grid Headers
+            top5Grid.getColumnByKey("name").setHeader(getTranslation(l, "planets.col.name"));
+            top5Grid.getColumnByKey("population").setHeader(getTranslation(l, "planets.col.population"));
+            
+            // Refresh Grid Data (for cell renderers)
+            top5Grid.getDataProvider().refreshAll();
+            
+            // Update Browser Page Title
+            updatePageTitle(l);
+        });
     }
 
-    private String translateList(String value) {
+    private void updatePageTitle(Locale l) {
+        getUI().ifPresent(ui -> ui.getPage().setTitle(getTranslation(l, "nav.dashboard") + " - " + getTranslation(l, "app.title")));
+    }
+
+    private String translateList(String value, Locale locale) {
         if (value == null || value.isEmpty() || "unknown".equalsIgnoreCase(value)) {
-            return getTranslation("planet.term.unknown");
+            return getTranslation(locale, "planet.term.unknown");
         }
         return java.util.stream.Stream.of(value.split(","))
                 .map(String::trim)
-                .map(part -> getTranslation("planet.term." + part.toLowerCase().replace(" ", "_")))
+                .map(part -> getTranslation(locale, "planet.term." + part.toLowerCase().replace(" ", "_")))
                 .collect(java.util.stream.Collectors.joining(", "));
+    }
+
+    private void styleCard(VerticalLayout card) {
+        card.setSpacing(true);
+        card.getStyle().set("background-color", "var(--lumo-base-color)");
+        card.getStyle().set("border-radius", "var(--lumo-size-m)");
+        card.getStyle().set("box-shadow", "var(--lumo-box-shadow-s)");
+        card.setPadding(true);
     }
 
     @Override
     public String getPageTitle() {
-        return getTranslation("nav.dashboard") + " - " + getTranslation("app.title");
+        Locale l = userSession.getLocaleSignal().peek();
+        if (l == null) l = Locale.ENGLISH;
+        return getTranslation(l, "nav.dashboard") + " - " + getTranslation(l, "app.title");
     }
 }

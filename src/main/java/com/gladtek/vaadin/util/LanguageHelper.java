@@ -36,6 +36,22 @@ public class LanguageHelper {
     }
 
     /**
+     * Returns the appropriate locale for number and date formatting.
+     * For Arabic, it uses 'ar-u-nu-latn' to explicitly request Western Arabic numerals (1, 2, 3),
+     * which are standard in many modern contexts and the Maghreb region.
+     *
+     * @param locale The base locale.
+     * @return The formatting locale.
+     */
+    public static Locale getFormattingLocale(Locale locale) {
+        if (locale != null && locale.getLanguage().equals("ar")) {
+            // Force Latin numeral system (Western Arabic numerals)
+            return Locale.forLanguageTag("ar-u-nu-latn");
+        }
+        return locale;
+    }
+
+    /**
      * Returns a list of common RTL Locale objects.
      *
      * @return List of RTL Locales.

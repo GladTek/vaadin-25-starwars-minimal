@@ -1,5 +1,6 @@
 package com.gladtek.vaadin.views.showcase.components;
 
+import com.gladtek.vaadin.services.UserSession;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
@@ -15,109 +16,143 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.signals.Signal;
+
+import java.util.Locale;
 
 public class DialogSection extends VerticalLayout {
 
-    public DialogSection() {
+    private final UserSession userSession;
+    private final Button dialogBtn;
+    private final Button defaultNotifyBtn;
+    private final Button successNotifyBtn;
+    private final Button errorNotifyBtn;
+    private final Button mentionNotifyBtn;
+    private final H3 dialogsTitle;
+    private final H3 notificationsTitle;
+
+    public DialogSection(UserSession userSession) {
+        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 
-        Button dialogBtn = new Button(getTranslation("components.dialog.open"), e -> {
+        dialogBtn = new Button();
+        dialogBtn.addClickListener(e -> {
             Dialog dialog = new Dialog();
-            dialog.setHeaderTitle(getTranslation("components.dialog.title"));
-            dialog.add(new Span(getTranslation("components.dialog.content")));
-            Button closeButton = new Button(getTranslation("components.dialog.close"), event -> dialog.close());
+            
+            // To support live translations while dialog is open, we could use Signal.effect inside here,
+            // but for simplicity we'll just evaluate the current locale when opening.
+            Locale l = userSession.getLocaleSignal().peek();
+            dialog.setHeaderTitle(getTranslation(l, "components.dialog.title"));
+            
+            Span contentSpan = new Span();
+            contentSpan.bindText(userSession.getLocaleSignal().map(loc -> getTranslation(loc, "components.dialog.content")));
+            dialog.add(contentSpan);
+            
+            Button closeButton = new Button();
+            closeButton.bindText(userSession.getLocaleSignal().map(loc -> getTranslation(loc, "components.dialog.close")));
+            closeButton.addClickListener(event -> dialog.close());
             dialog.getFooter().add(closeButton);
+            
             dialog.open();
         });
 
-        Button defaultNotifyBtn = new Button(getTranslation("components.notification.default"), e -> {
-            Notification.show(getTranslation("components.notification.message"));
+        defaultNotifyBtn = new Button();
+        defaultNotifyBtn.addClickListener(e -> {
+            Notification.show(getTranslation(userSession.getLocaleSignal().peek(), "components.notification.message"));
         });
 
-        Button successNotifyBtn = new Button(getTranslation("components.notification.success"), e -> {
-            createSubmitSuccess().open();
-        });
+        successNotifyBtn = new Button();
+        successNotifyBtn.addClickListener(e -> createSubmitSuccess().open());
 
-        Button errorNotifyBtn = new Button(getTranslation("components.notification.error"), e -> {
-            createReportError().open();
-        });
+        errorNotifyBtn = new Button();
+        errorNotifyBtn.addClickListener(e -> createReportError().open());
 
-        Button mentionNotifyBtn = new Button(getTranslation("components.notification.mention"), e -> {
-            createMentionNotification().open();
-        });
+        mentionNotifyBtn = new Button();
+        mentionNotifyBtn.addClickListener(e -> createMentionNotification().open());
 
         HorizontalLayout notificationsButtons = new HorizontalLayout(defaultNotifyBtn, successNotifyBtn, errorNotifyBtn, mentionNotifyBtn);
 
-        H3 dialogsTitle = new H3(getTranslation("components.dialogs.title"));
-        H3 notificationsTitle = new H3(getTranslation("components.notification.title"));
+        dialogsTitle = new H3();
+        notificationsTitle = new H3();
         add(dialogsTitle, dialogBtn, notificationsTitle, notificationsButtons);
 
+        // Reactive bindings
+        Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            dialogBtn.setText(getTranslation(l, "components.dialog.open"));
+            defaultNotifyBtn.setText(getTranslation(l, "components.notification.default"));
+            successNotifyBtn.setText(getTranslation(l, "components.notification.success"));
+            errorNotifyBtn.setText(getTranslation(l, "components.notification.error"));
+            mentionNotifyBtn.setText(getTranslation(l, "components.notification.mention"));
+            dialogsTitle.setText(getTranslation(l, "components.dialogs.title"));
+            notificationsTitle.setText(getTranslation(l, "components.notification.title"));
+        });
     }
 
     public Notification createSubmitSuccess() {
+        Locale l = userSession.getLocaleSignal().peek();
         Notification notification = new Notification();
         notification.addThemeVariants(NotificationVariant.SUCCESS);
 
         Icon icon = VaadinIcon.CHECK_CIRCLE.create();
 
-        Button viewBtn = new Button(getTranslation("components.notification.action.view"));
+        Button viewBtn = new Button(getTranslation(l, "components.notification.action.view"));
 
         HorizontalLayout layout = new HorizontalLayout(icon,
-                new Text(getTranslation("components.notification.success.text")));
-        layout.addToEnd(viewBtn, createCloseBtn(notification));
+                new Text(getTranslation(l, "components.notification.success.text")));
+        layout.addToEnd(viewBtn, createCloseBtn(notification, l));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setMinWidth("350px");
 
         notification.add(layout);
-
         return notification;
     }
 
     public Notification createReportError() {
+        Locale l = userSession.getLocaleSignal().peek();
         Notification notification = new Notification();
         notification.addThemeVariants(NotificationVariant.ERROR);
 
         Icon icon = VaadinIcon.WARNING.create();
-        Button retryBtn = new Button(getTranslation("components.notification.action.retry"));
+        Button retryBtn = new Button(getTranslation(l, "components.notification.action.retry"));
 
         HorizontalLayout layout = new HorizontalLayout(icon,
-                new Text(getTranslation("components.notification.error.text")));
-        layout.addToEnd(retryBtn, createCloseBtn(notification));
+                new Text(getTranslation(l, "components.notification.error.text")));
+        layout.addToEnd(retryBtn, createCloseBtn(notification, l));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setMinWidth("350px");
 
         notification.add(layout);
-
         return notification;
     }
 
     public Notification createMentionNotification() {
+        Locale l = userSession.getLocaleSignal().peek();
         Notification notification = new Notification();
 
-        Avatar avatar = new Avatar(getTranslation("components.notification.mention.user"));
+        Avatar avatar = new Avatar(getTranslation(l, "components.notification.mention.user"));
 
-        Span name = new Span(getTranslation("components.notification.mention.user"));
+        Span name = new Span(getTranslation(l, "components.notification.mention.user"));
         name.getStyle().set("font-weight", "500");
 
-        Anchor projectLink = new Anchor("https://gladtek.com", getTranslation("components.notification.mention.project"));
+        Anchor projectLink = new Anchor("https://gladtek.com", getTranslation(l, "components.notification.mention.project"));
         projectLink.setTarget("_blank");
 
-        Div info = new Div(name, new Text(" " + getTranslation("components.notification.mention.text") + " "), projectLink);
+        Div info = new Div(name, new Text(" " + getTranslation(l, "components.notification.mention.text") + " "), projectLink);
 
         HorizontalLayout layout = new HorizontalLayout(avatar, info);
-        layout.addToEnd(createCloseBtn(notification));
+        layout.addToEnd(createCloseBtn(notification, l));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setMinWidth("350px");
 
         notification.add(layout);
-
         return notification;
     }
 
-    public Button createCloseBtn(Notification notification) {
+    public Button createCloseBtn(Notification notification, Locale l) {
         Button closeBtn = new Button(VaadinIcon.CLOSE_SMALL.create(), e -> notification.close());
-        closeBtn.setAriaLabel(getTranslation("components.dialog.close_aria"));
+        closeBtn.setAriaLabel(getTranslation(l, "components.dialog.close_aria"));
         return closeBtn;
     }
 }

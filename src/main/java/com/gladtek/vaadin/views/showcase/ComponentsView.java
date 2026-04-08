@@ -1,61 +1,56 @@
 package com.gladtek.vaadin.views.showcase;
 
 import com.gladtek.vaadin.layout.MainLayout;
+import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.views.showcase.components.*;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
-import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.signals.Signal;
+
+import java.util.Locale;
 
 @Route(value = "components", layout = MainLayout.class)
-@AnonymousAllowed
 public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
 
+    private final UserSession userSession;
     private final FlexLayout contentContainer = new FlexLayout();
+    private final H2 header;
+    private final Span description;
+    private final TabSheet tabSheet;
 
-    public ComponentsView() {
+    public ComponentsView(UserSession userSession) {
+        this.userSession = userSession;
+        
         setSpacing(true);
         setPadding(true);
         setSizeFull();
 
-        add(new H2(getTranslation("components.header")));
-        add(new Span(getTranslation("components.description")));
-
-        Tabs tabs = new Tabs();
-
-        tabs.setWidthFull();
-
-        Tab experimentalTab = new Tab(getTranslation("components.tab.experimental"));
-        Tab inputTab = new Tab(getTranslation("components.tab.inputs"));
-        Tab buttonTab = new Tab(getTranslation("components.tab.buttons"));
-        Tab selectionTab = new Tab(getTranslation("components.tab.selection"));
-        Tab displayTab = new Tab(getTranslation("components.tab.display"));
-        Tab cardTab = new Tab(getTranslation("components.tab.card"));
-        Tab dialogTab = new Tab(getTranslation("components.tab.dialogs"));
-
-        tabs.add(experimentalTab, inputTab, buttonTab, selectionTab, displayTab, cardTab, dialogTab);
+        header = new H2();
+        description = new Span();
+        add(header, description);
 
         // Configure responsive container
         contentContainer.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         contentContainer.getStyle().set("gap", "32px");
         contentContainer.setSizeFull();
 
-        // Create contents using new component classes
-        ExperimentalSection experimentalSection = new ExperimentalSection();
-        InputSection inputSection = new InputSection();
-        ButtonSection buttonSection = new ButtonSection();
-        SelectionSection selectionSection = new SelectionSection();
-        DisplaySection displaySection = new DisplaySection();
-        CardSection cardSection = new CardSection();
-        DialogSection dialogSection = new DialogSection();
+        // Create contents using new component classes inject session
+        ExperimentalSection experimentalSection = new ExperimentalSection(userSession);
+        InputSection inputSection = new InputSection(userSession);
+        ButtonSection buttonSection = new ButtonSection(userSession);
+        SelectionSection selectionSection = new SelectionSection(userSession);
+        DisplaySection displaySection = new DisplaySection(userSession);
+        CardSection cardSection = new CardSection(userSession);
+        DialogSection dialogSection = new DialogSection(userSession);
 
-        // Style sections (keep some styling but ensure they fill space in single view)
+        // Style sections
         styleSection(experimentalSection);
         styleSection(inputSection);
         styleSection(buttonSection);
@@ -64,31 +59,54 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
         styleSection(cardSection);
         styleSection(dialogSection);
 
-        // Add contents to container
-        //contentContainer.add(inputSection, buttonSection, selectionSection, displaySection, cardSection, dialogSection);
-
-        TabSheet tabSheet = new TabSheet();
+        tabSheet = new TabSheet();
         tabSheet.setSizeFull();
-        tabSheet.add(getTranslation("components.tab.experimental"),experimentalSection);
-        tabSheet.add(getTranslation("components.tab.inputs"),inputSection);
-        tabSheet.add(getTranslation("components.tab.buttons"), buttonSection);
-        tabSheet.add(getTranslation("components.tab.selection"), selectionSection);
-        tabSheet.add(getTranslation("components.tab.display"),displaySection);
-        tabSheet.add(getTranslation("components.tab.card"), cardSection);
-        tabSheet.add(getTranslation("components.tab.dialogs"), dialogSection);
+        // Add content, label will be assigned via Signal
+        Tab expTab = tabSheet.add("", experimentalSection);
+        Tab inTab = tabSheet.add("", inputSection);
+        Tab btnTab = tabSheet.add("", buttonSection);
+        Tab selTab = tabSheet.add("", selectionSection);
+        Tab dispTab = tabSheet.add("", displaySection);
+        Tab cardTab = tabSheet.add("", cardSection);
+        Tab diagTab = tabSheet.add("", dialogSection);
 
         add(tabSheet);
+
+        // Reactive bindings
+        header.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "components.header")));
+        description.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "components.description")));
+
+        Signal.effect(this, () -> {
+            Locale l = userSession.getLocaleSignal().get();
+            
+            // Tab labels
+            expTab.setLabel(getTranslation(l, "components.tab.experimental"));
+            inTab.setLabel(getTranslation(l, "components.tab.inputs"));
+            btnTab.setLabel(getTranslation(l, "components.tab.buttons"));
+            selTab.setLabel(getTranslation(l, "components.tab.selection"));
+            dispTab.setLabel(getTranslation(l, "components.tab.display"));
+            cardTab.setLabel(getTranslation(l, "components.tab.card"));
+            diagTab.setLabel(getTranslation(l, "components.tab.dialogs"));
+            
+            // Browser Page Title update
+            getUI().ifPresent(ui -> ui.getPage().setTitle(getPageTitle(l)));
+        });
     }
 
     private void styleSection(VerticalLayout section) {
-        section.setWidthFull(); // Fill width in tab view
+        section.setWidthFull();
         section.getStyle().set("box-shadow", "0 1px 4px 0 rgba(0, 0, 0, 0.1)");
         section.getStyle().set("border-radius", "8px");
         section.getStyle().set("padding", "20px");
     }
 
+    private String getPageTitle(Locale l) {
+        if (l == null) l = Locale.ENGLISH;
+        return getTranslation(l, "components.title");
+    }
+
     @Override
     public String getPageTitle() {
-        return getTranslation("components.title");
+        return getPageTitle(userSession.getLocaleSignal().peek());
     }
 }
