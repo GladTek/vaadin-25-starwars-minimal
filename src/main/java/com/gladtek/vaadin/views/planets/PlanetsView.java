@@ -5,9 +5,9 @@ import com.gladtek.vaadin.models.Planet;
 import com.gladtek.vaadin.services.PlanetService;
 import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.util.LanguageHelper;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -16,19 +16,19 @@ import com.vaadin.flow.signals.Signal;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Route(value = "planets", layout = MainLayout.class)
 public class PlanetsView extends VerticalLayout implements HasDynamicTitle {
 
     private final UserSession userSession;
-    private final PlanetService planetService;
     private final PlanetDetail planetDetail;
     private final H2 title;
     private final Grid<Planet> grid;
 
     public PlanetsView(UserSession userSession, PlanetService planetService) {
         this.userSession = userSession;
-        this.planetService = planetService;
 
         setSizeFull();
         setPadding(false);
@@ -53,7 +53,7 @@ public class PlanetsView extends VerticalLayout implements HasDynamicTitle {
                 .setKey("terrain");
 
         grid.addComponentColumn(planet -> {
-                    com.vaadin.flow.component.html.Span span = new com.vaadin.flow.component.html.Span();
+                    Span span = new Span();
                     span.bindText(Signal.computed(() -> {
                         String popStr = planet.populationSignal().get();
                         Locale l = userSession.getLocaleSignal().get();
@@ -160,10 +160,10 @@ public class PlanetsView extends VerticalLayout implements HasDynamicTitle {
         if (value == null || value.isEmpty() || "unknown".equalsIgnoreCase(value)) {
             return getTranslation(locale, "planet.term.unknown");
         }
-        return java.util.stream.Stream.of(value.split(","))
+        return Stream.of(value.split(","))
                 .map(String::trim)
                 .map(part -> getTranslation(locale, "planet.term." + part.toLowerCase().replace(" ", "_")))
-                .collect(java.util.stream.Collectors.joining(", "));
+                .collect(Collectors.joining(", "));
     }
 
     @Override

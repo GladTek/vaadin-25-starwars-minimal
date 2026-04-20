@@ -5,6 +5,7 @@ import com.vaadin.flow.signals.shared.SharedListSignal;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,8 +17,8 @@ public class AllianceRegistry {
 
     private final ProfileNameService profileNameService;
     private final SharedListSignal<UserAlliance> activeAlliances = new SharedListSignal<>(UserAlliance.class);
-    // Pure Java Reference Counting: Track how many tabs are open for each session
-    private final Map<String, Integer> tabCounts = new ConcurrentHashMap<>();
+    // Track unique UI IDs per session to prevent leak on navigation
+    private final Map<String, Set<Integer>> sessionUIs = new ConcurrentHashMap<>();
 
     public AllianceRegistry(ProfileNameService profileNameService) {
         this.profileNameService = profileNameService;
@@ -53,9 +54,9 @@ public class AllianceRegistry {
     /**
      * Registers or updates a user session. Uses reference counting for tabs.
      */
-    public String registerOrUpdate(String sessionId, String side, String existingProfileName) {
-        // Increment the number of active tabs for this session
-        tabCounts.merge(sessionId, 1, Integer::sum);
+    public String registerOrUpdate(String sessionId, int uiId, String side, String existingProfileName) {
+        // Track unique UI ID for this session
+        sessionUIs.computeIfAbsent(sessionId, k -> ConcurrentHashMap.newKeySet()).add(uiId);
 
         return activeAlliances.peek().stream()
             .filter(uS -> sessionId.equals(uS.peek().sessionId()))
@@ -76,8 +77,8 @@ public class AllianceRegistry {
             });
     }
 
-    public String registerOrUpdate(String sessionId, String side) {
-        return registerOrUpdate(sessionId, side, null);
+    public String registerOrUpdate(String sessionId, int uiId, String side) {
+        return registerOrUpdate(sessionId, uiId, side, null);
     }
 
     /**
@@ -110,18 +111,18 @@ public class AllianceRegistry {
      * Removes a tab reference. Only removes the session from the registry 
      * when the very last tab is closed.
      */
-    public void unregister(String sessionId) {
-        tabCounts.computeIfPresent(sessionId, (id, count) -> {
-            int newCount = count - 1;
-            if (newCount <= 0) {
+    public void unregister(String sessionId, int uiId) {
+        Set<Integer> uis = sessionUIs.get(sessionId);
+        if (uis != null) {
+            uis.remove(uiId);
+            if (uis.isEmpty()) {
+                sessionUIs.remove(sessionId);
                 // Last tab closed, perform final cleanup
                 activeAlliances.peek().stream()
                     .filter(uS -> sessionId.equals(uS.peek().sessionId()))
                     .findFirst()
                     .ifPresent(activeAlliances::remove);
-                return null; // Remove from tabCounts map
             }
-            return newCount;
-        });
+        }
     }
 }

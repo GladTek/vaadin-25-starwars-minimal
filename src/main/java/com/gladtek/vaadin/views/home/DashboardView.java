@@ -5,7 +5,6 @@ import com.gladtek.vaadin.models.Planet;
 import com.gladtek.vaadin.services.PlanetService;
 import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.util.LanguageHelper;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
@@ -19,6 +18,8 @@ import com.vaadin.flow.signals.Signal;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Route(value = "dashboard", layout = MainLayout.class)
 public class DashboardView extends VerticalLayout implements HasDynamicTitle {
@@ -130,7 +131,7 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
                 .setKey("name");
 
         top5Grid.addComponentColumn(p -> {
-            com.vaadin.flow.component.html.Span span = new com.vaadin.flow.component.html.Span();
+            Span span = new Span();
             span.bindText(Signal.computed(() -> {
                 String popStr = p.populationSignal().get();
                 Locale l = userSession.getLocaleSignal().get();
@@ -241,10 +242,10 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
         if (value == null || value.isEmpty() || "unknown".equalsIgnoreCase(value)) {
             return getTranslation(locale, "planet.term.unknown");
         }
-        return java.util.stream.Stream.of(value.split(","))
+        return Stream.of(value.split(","))
                 .map(String::trim)
                 .map(part -> getTranslation(locale, "planet.term." + part.toLowerCase().replace(" ", "_")))
-                .collect(java.util.stream.Collectors.joining(", "));
+                .collect(Collectors.joining(", "));
     }
 
     private void styleCard(VerticalLayout card) {

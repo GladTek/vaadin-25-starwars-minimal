@@ -12,6 +12,9 @@ import com.gladtek.vaadin.views.home.SplitScreenView;
 import com.gladtek.vaadin.views.planets.PlanetsView;
 import com.gladtek.vaadin.views.showcase.ComponentsView;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -148,10 +151,24 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         UI ui = attachEvent.getUI();
         String sessionId = ui.getSession().getSession().getId();
         profileName.bindText(allianceRegistry.getMyProfileName(sessionId));
+        
+        // Add JS listener to notify server when window closes
+        ui.getPage().executeJs(
+            "window.addEventListener('beforeunload', () => { $0.$server.triggerUnregister(); });",
+            this.getElement()
+        );
+    }
+    
+    @ClientCallable
+    public void triggerUnregister() {
+        getUI().ifPresent(ui -> {
+            String sessionId = ui.getSession().getSession().getId();
+            allianceRegistry.unregister(sessionId, ui.getUIId());
+        });
     }
 
     @Override
-    public void setContent(com.vaadin.flow.component.Component content) {
+    public void setContent(Component content) {
         if (content instanceof Main) {
             super.setContent(content);
         } else {
@@ -174,7 +191,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
             event.rerouteTo(SplitScreenView.class);
         } else {
             String sessionId = ui.getSession().getSession().getId();
-            allianceRegistry.registerOrUpdate(sessionId, side, userSession.getProfileName());
+            allianceRegistry.registerOrUpdate(sessionId, ui.getUIId(), side, userSession.getProfileName());
             
             String pageName = getPageTitleFor(event.getNavigationTarget(), userSession.getLocaleSignal().peek());
             allianceRegistry.updateCurrentPage(sessionId, pageName);
@@ -190,12 +207,12 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     }
 
     @Override
-    protected void onDetach(com.vaadin.flow.component.DetachEvent detachEvent) {
+    protected void onDetach(DetachEvent detachEvent) {
         super.onDetach(detachEvent);
         UI ui = detachEvent.getUI();
         if (ui != null) {
             String sessionId = ui.getSession().getSession().getId();
-            allianceRegistry.unregister(sessionId);
+            allianceRegistry.unregister(sessionId, ui.getUIId());
         }
     }
 }

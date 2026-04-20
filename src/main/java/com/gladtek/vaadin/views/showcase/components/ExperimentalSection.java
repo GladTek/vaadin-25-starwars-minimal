@@ -15,7 +15,6 @@ import java.util.Locale;
 
 public class ExperimentalSection extends VerticalLayout {
 
-    private final UserSession userSession;
     private final H3 badgesTitle;
     private final Badge pending;
     private final Badge confirmed;
@@ -28,7 +27,6 @@ public class ExperimentalSection extends VerticalLayout {
     private final Slider sliderMinMax;
 
     public ExperimentalSection(UserSession userSession) {
-        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 

@@ -10,6 +10,8 @@ vaadin:
   allowed-packages: com.vaadin,org.vaadin,com.flowingcode,com.gladtek
   copilot:
     enable: true
+  heartbeat-interval: 10
+  close-idle-sessions: true
 
 rybbit:
   analytics:
@@ -20,8 +22,8 @@ rybbit:
 app:
   meta:
     og:
-      title: "Vaadin 25 Star Wars Demo"
-      description: "A modern small demo application built with Vaadin 25 and Spring Boot, demonstrating advanced UI concepts, dynamic scheming dark/light mode, and full internationalization within a Star Wars-themed context."
-      image: "https://starwars.gladtek.com/icons/icon.png"
-      url: "https://starwars.gladtek.com"
-      type: "website"
+      title: ${APP_META_OG_TITLE:Vaadin 25 Star Wars Demo}
+      description: ${APP_META_OG_DESCRIPTION:A Star Wars-themed demo showcasing Vaadin 25 Signals, dynamic light/dark modes, and full internationalization (i18n) with RTL support.}
+      image: ${APP_META_OG_IMAGE:https://starwars.gladtek.com/icons/icon.png}
+      url: ${APP_META_OG_URL:https://starwars.gladtek.com}
+      type: ${APP_META_OG_TYPE:website}

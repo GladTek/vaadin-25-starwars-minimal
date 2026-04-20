@@ -14,8 +14,6 @@ import com.vaadin.flow.signals.Signal;
 import java.util.Locale;
 
 public class ButtonSection extends VerticalLayout {
-
-    private final UserSession userSession;
     
     // Row 1
     private final Button r1Default;
@@ -36,7 +34,6 @@ public class ButtonSection extends VerticalLayout {
     private final Button r3Danger;
 
     public ButtonSection(UserSession userSession) {
-        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 

@@ -2,6 +2,7 @@ package com.gladtek.vaadin.views.showcase.components;
 
 import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.utils.DatePickerI18nUtil;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -17,7 +18,6 @@ import java.util.Locale;
 
 public class InputSection extends VerticalLayout {
 
-    private final UserSession userSession;
     private final TextField textField;
     private final TextArea textArea;
     private final PasswordField passwordField;
@@ -26,7 +26,6 @@ public class InputSection extends VerticalLayout {
     private final TimePicker timePicker;
 
     public InputSection(UserSession userSession) {
-        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
         setWidthFull();
@@ -76,7 +75,7 @@ public class InputSection extends VerticalLayout {
         });
     }
 
-    private void styleField(com.vaadin.flow.component.Component field) {
+    private void styleField(Component field) {
         field.getStyle().set("flex-grow", "1");
     }
 }

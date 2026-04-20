@@ -6,6 +6,7 @@ import com.vaadin.flow.server.communication.IndexHtmlRequestListener;
 import com.vaadin.flow.server.communication.IndexHtmlResponse;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,19 +18,19 @@ public class ApplicationServiceInitListener implements VaadinServiceInitListener
     }
 
 
-    @org.springframework.beans.factory.annotation.Value("${app.meta.og.title}")
+    @Value("${app.meta.og.title}")
     private String ogTitle;
 
-    @org.springframework.beans.factory.annotation.Value("${app.meta.og.description}")
+    @Value("${app.meta.og.description}")
     private String ogDescription;
 
-    @org.springframework.beans.factory.annotation.Value("${app.meta.og.image}")
+    @Value("${app.meta.og.image}")
     private String ogImage;
 
-    @org.springframework.beans.factory.annotation.Value("${app.meta.og.url}")
+    @Value("${app.meta.og.url}")
     private String ogUrl;
 
-    @org.springframework.beans.factory.annotation.Value("${app.meta.og.type}")
+    @Value("${app.meta.og.type}")
     private String ogType;
 
     @Override

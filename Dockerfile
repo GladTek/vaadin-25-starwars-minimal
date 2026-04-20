@@ -32,4 +32,11 @@ ENV RYBBIT_ANALYTICS_SITE_ID=RYBBIT-DEMO-ID
 ENV RYBBIT_ANALYTICS_SCRIPT_URL=https://analytics.example.com/api/script.js
 ENV RYBBIT_ANALYTICS_ENABLE_WEB_VITALS=false
 
+# App Metadata Configuration
+ENV APP_META_OG_TITLE="Vaadin 25 Star Wars Demo"
+ENV APP_META_OG_DESCRIPTION="A Star Wars-themed demo showcasing Vaadin 25 Signals, dynamic light/dark modes, and full internationalization (i18n) with RTL support."
+ENV APP_META_OG_IMAGE="https://starwars.gladtek.com/icons/icon.png"
+ENV APP_META_OG_URL="https://starwars.gladtek.com"
+ENV APP_META_OG_TYPE="website"
+
 ENTRYPOINT ["java", "-jar", "/app.jar", "--spring.profiles.active=prod"]

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 public class DatePickerI18nUtil {
@@ -34,7 +35,7 @@ public class DatePickerI18nUtil {
         shortWeekDaysList.addAll(Arrays.asList(shortWeekdays).subList(1, 8));
         i18n.setWeekdaysShort(shortWeekDaysList);
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("vaadin-i18n.translations", locale);
+        ResourceBundle bundle = ResourceBundle.getBundle("vaadin-i18n.translations", locale);
         i18n.setToday(bundle.getString("components.datepicker.today"));
         i18n.setCancel(bundle.getString("components.datepicker.cancel"));
 

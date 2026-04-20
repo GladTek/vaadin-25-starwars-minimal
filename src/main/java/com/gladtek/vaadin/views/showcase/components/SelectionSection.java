@@ -15,14 +15,12 @@ import java.util.Locale;
 
 public class SelectionSection extends VerticalLayout {
 
-    private final UserSession userSession;
     private final ComboBox<String> comboBox;
     private final Select<String> select;
     private final Checkbox checkbox;
     private final RadioButtonGroup<String> radioGroup;
 
     public SelectionSection(UserSession userSession) {
-        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 

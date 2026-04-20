@@ -14,8 +14,6 @@ import java.util.Locale;
 
 public class CardSection extends VerticalLayout {
 
-    private final UserSession userSession;
-
     private final Image mediaImage;
     private final Card simpleCard;
     private final Span simpleCardContent;
@@ -28,7 +26,6 @@ public class CardSection extends VerticalLayout {
     private final H3 advancedTitle;
 
     public CardSection(UserSession userSession) {
-        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 

@@ -14,6 +14,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.signals.Signal;
 
 import java.util.Locale;
 
@@ -84,7 +85,7 @@ public class SplitScreenView extends HorizontalLayout implements HasDynamicTitle
         lightDesc.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "split.light.desc")));
         
         // Signal-based page title AND UI direction
-        com.vaadin.flow.signals.Signal.effect(this, () -> {
+        Signal.effect(this, () -> {
             Locale l = userSession.getLocaleSignal().get();
             UI.getCurrent().getPage().setTitle(getTranslation(l, "app.title"));
             
@@ -114,7 +115,7 @@ public class SplitScreenView extends HorizontalLayout implements HasDynamicTitle
             
             UI ui = UI.getCurrent();
             String sessionId = ui.getSession().getSession().getId();
-            String persona = allianceRegistry.registerOrUpdate(sessionId, sideKey, userSession.getProfileName());
+            String persona = allianceRegistry.registerOrUpdate(sessionId, ui.getUIId(), sideKey, userSession.getProfileName());
             userSession.setProfileName(persona);
             
             getUI().ifPresent(activeUi -> {

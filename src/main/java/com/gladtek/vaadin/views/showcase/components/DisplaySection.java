@@ -17,8 +17,6 @@ import java.util.Locale;
 
 public class DisplaySection extends VerticalLayout {
 
-    private final UserSession userSession;
-
     private final AccordionPanel panel1;
     private final Span panel1Content;
     private final AccordionPanel panel2;
@@ -36,7 +34,6 @@ public class DisplaySection extends VerticalLayout {
     private final Badge denied;
 
     public DisplaySection(UserSession userSession) {
-        this.userSession = userSession;
         setPadding(false);
         setSpacing(true);
 

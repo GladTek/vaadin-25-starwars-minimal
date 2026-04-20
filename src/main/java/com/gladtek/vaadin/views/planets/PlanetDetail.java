@@ -14,6 +14,8 @@ import com.vaadin.flow.signals.Signal;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PlanetDetail extends VerticalLayout {
     private final UserSession userSession;
@@ -110,10 +112,10 @@ public class PlanetDetail extends VerticalLayout {
         if (value == null || value.isEmpty() || "unknown".equalsIgnoreCase(value)) {
             return getTranslation(locale, "planet.term.unknown");
         }
-        return java.util.stream.Stream.of(value.split(","))
+        return Stream.of(value.split(","))
                 .map(String::trim)
                 .map(part -> getTranslation(locale, "planet.term." + part.toLowerCase().replace(" ", "_")))
-                .collect(java.util.stream.Collectors.joining(", "));
+                .collect(Collectors.joining(", "));
     }
 
     public Registration addCloseListener(

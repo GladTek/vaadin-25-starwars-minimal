@@ -7,6 +7,7 @@ import com.vaadin.flow.signals.shared.SharedValueSignal;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PlanetService {
@@ -92,7 +93,7 @@ public class PlanetService {
         return getPlanets().stream()
                 .sorted((p1, p2) -> Long.compare(parsePopulation(p2.populationSignal().peek()), parsePopulation(p1.populationSignal().peek())))
                 .limit(5)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     public Planet getFeaturedPlanet() {
