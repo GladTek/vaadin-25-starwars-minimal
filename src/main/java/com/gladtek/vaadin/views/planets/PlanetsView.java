@@ -8,7 +8,7 @@ import com.gladtek.vaadin.util.LanguageHelper;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -90,35 +90,30 @@ public class PlanetsView extends VerticalLayout implements HasDynamicTitle {
 
         grid.setSizeFull();
 
-        FlexLayout contentLayout = new FlexLayout();
+        MasterDetailLayout contentLayout = new MasterDetailLayout();
         contentLayout.setSizeFull();
-        contentLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
-        contentLayout.getStyle().set("gap", "20px");
-
-        grid.getStyle().set("flex-grow", "2");
-        grid.getStyle().set("flex-basis", "600px");
-        grid.getStyle().set("min-width", "400px");
+        contentLayout.setMasterSize("60%");
+        contentLayout.setDetailSize("40%");
+        contentLayout.setExpandMaster(true);
+        contentLayout.setMaster(grid);
 
         planetDetail = new PlanetDetail(userSession);
-        planetDetail.getStyle().set("flex-grow", "1");
-        planetDetail.getStyle().set("flex-basis", "300px");
-        planetDetail.getStyle().set("min-width", "300px");
-        planetDetail.setVisible(false);
 
-        contentLayout.add(grid, planetDetail);
         add(title, contentLayout);
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             Planet selected = event.getValue();
             if (selected != null) {
                 planetDetail.setPlanet(selected);
-                planetDetail.setVisible(true);
+                contentLayout.setDetail(planetDetail);
             } else {
-                planetDetail.setVisible(false);
+                contentLayout.setDetail(null);
             }
         });
 
         planetDetail.addCloseListener(event -> grid.deselectAll());
+        contentLayout.addBackdropClickListener(event -> grid.deselectAll());
+        contentLayout.addDetailEscapePressListener(event -> grid.deselectAll());
 
         // Reactive Bindings
         setupReactiveBindings();

@@ -10,6 +10,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.signals.local.ValueSignal;
 import com.vaadin.flow.signals.Signal;
 
 import java.text.NumberFormat;
@@ -26,7 +27,7 @@ public class PlanetDetail extends VerticalLayout {
     private final TextField population;
     private final Button closeButton;
     
-    private Planet currentPlanet;
+    private final ValueSignal<Planet> selectedPlanet = new ValueSignal<>(null);
 
     public PlanetDetail(UserSession userSession) {
         this.userSession = userSession;
@@ -34,6 +35,7 @@ public class PlanetDetail extends VerticalLayout {
         setSizeFull();
         setPadding(true);
         setSpacing(true);
+        
         formLayout = new FormLayout();
 
         name = new TextField();
@@ -67,44 +69,40 @@ public class PlanetDetail extends VerticalLayout {
             population.setLabel(getTranslation(l, "planet.detail.population"));
             closeButton.setText(getTranslation(l, "planet.detail.close"));
             
-            if (currentPlanet != null) {
-                updateValuesForLocale(l);
+            Planet planet = selectedPlanet.get();
+            if (planet != null) {
+                name.setValue(getTranslation(l, "planet.name." + planet.name().toLowerCase().replace(" ", "_")));
+                climate.setValue(translateList(planet.climate(), l));
+                terrain.setValue(translateList(planet.terrain(), l));
+                
+                String popStr = planet.populationSignal().get();
+                int trend = planet.trendSignal().get();
+                
+                population.getStyle().remove("--vaadin-input-field-value-color");
+                if (trend > 0) population.getStyle().set("--vaadin-input-field-value-color", "green");
+                else if (trend < 0) population.getStyle().set("--vaadin-input-field-value-color", "red");
+
+                if ("unknown".equalsIgnoreCase(popStr)) {
+                    population.setValue(getTranslation(l, "planet.term.unknown"));
+                } else {
+                    try {
+                        long pop = Long.parseLong(popStr);
+                        Locale formatLocale = LanguageHelper.getFormattingLocale(l);
+                        population.setValue(NumberFormat.getInstance(formatLocale).format(pop));
+                    } catch (NumberFormatException e) {
+                        population.setValue(popStr);
+                    }
+                }
             }
         });
     }
 
     public void setPlanet(Planet planet) {
-        this.currentPlanet = planet;
+        selectedPlanet.set(planet);
         if (planet != null) {
-            updateValuesForLocale(userSession.getLocaleSignal().peek());
             setVisible(true);
         } else {
             setVisible(false);
-        }
-    }
-    
-    private void updateValuesForLocale(Locale l) {
-        name.setValue(getTranslation(l, "planet.name." + currentPlanet.name().toLowerCase().replace(" ", "_")));
-        climate.setValue(translateList(currentPlanet.climate(), l));
-        terrain.setValue(translateList(currentPlanet.terrain(), l));
-        
-        String popStr = currentPlanet.populationSignal().get();
-        int trend = currentPlanet.trendSignal().get();
-        
-        population.getStyle().remove("--vaadin-input-field-value-color");
-        if (trend > 0) population.getStyle().set("--vaadin-input-field-value-color", "green");
-        else if (trend < 0) population.getStyle().set("--vaadin-input-field-value-color", "red");
-
-        if ("unknown".equalsIgnoreCase(popStr)) {
-            population.setValue(getTranslation(l, "planet.term.unknown"));
-        } else {
-            try {
-                long pop = Long.parseLong(popStr);
-                Locale formatLocale = LanguageHelper.getFormattingLocale(l);
-                population.setValue(NumberFormat.getInstance(formatLocale).format(pop));
-            } catch (NumberFormatException e) {
-                population.setValue(popStr);
-            }
         }
     }
     

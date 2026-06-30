@@ -9,7 +9,7 @@ vaadin:
   launch-browser: false
   allowed-packages: com.vaadin,org.vaadin,com.flowingcode,com.gladtek
   copilot:
-    enable: true
+    enable: false
   heartbeat-interval: 10
   close-idle-sessions: true
 

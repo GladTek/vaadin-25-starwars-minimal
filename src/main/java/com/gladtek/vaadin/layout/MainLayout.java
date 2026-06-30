@@ -72,6 +72,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         profileName = new Span();
         profileName.addClassName("profile-name");
         profileName.getStyle().set("font-weight", "bold")
+                     .set("color", "var(--vaadin-text-color)")
                      .set("white-space", "nowrap")
                      .set("margin-left", "1rem")
                      .set("font-size", "0.95rem")
