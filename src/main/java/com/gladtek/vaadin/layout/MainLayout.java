@@ -63,7 +63,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     private void createHeader() {
         logo = new H1();
         logo.getStyle().set("white-space", "nowrap")
-             .set("font-size", "var(--lumo-font-size-xl)")
+             .set("font-size", "var(--aura-font-size-xl)")
              .set("margin", "0");
 
         SchemeToggle schemeToggle = new SchemeToggle(userSession);

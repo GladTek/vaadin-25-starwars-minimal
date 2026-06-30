@@ -53,7 +53,7 @@ public class AlliancePresence extends HorizontalLayout {
         Span allianceStats = new Span();
         allianceStats.getStyle().set("white-space", "nowrap")
                           .set("font-size", "0.85rem")
-                          .set("color", "var(--lumo-secondary-text-color)")
+                          .set("color", "var(--vaadin-text-color-secondary)")
                           .set("flex-shrink", "0");
         
         // Reactively bind header text to the registry's computed counts

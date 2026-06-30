@@ -6,9 +6,9 @@ import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.slider.RangeSlider;
-import com.vaadin.flow.component.slider.RangeSliderValue;
-import com.vaadin.flow.component.slider.Slider;
+import com.vaadin.flow.component.slider.IntegerRangeSlider;
+import com.vaadin.flow.component.slider.IntegerRangeSliderValue;
+import com.vaadin.flow.component.slider.IntegerSlider;
 import com.vaadin.flow.signals.Signal;
 
 import java.util.Locale;
@@ -22,9 +22,9 @@ public class ExperimentalSection extends VerticalLayout {
     private final Badge denied;
 
     private final H3 slidersTitle;
-    private final Slider slider;
-    private final RangeSlider rangeSlider;
-    private final Slider sliderMinMax;
+    private final IntegerSlider slider;
+    private final IntegerRangeSlider rangeSlider;
+    private final IntegerSlider sliderMinMax;
 
     public ExperimentalSection(UserSession userSession) {
         setPadding(false);
@@ -43,20 +43,20 @@ public class ExperimentalSection extends VerticalLayout {
         badgesContainer.add(pending, confirmed, warning, denied);
 
         slidersTitle = new H3();
-        slider = new Slider();
-        slider.setValue(50.0);
+        slider = new IntegerSlider();
+        slider.setValue(50);
         
-        rangeSlider = new RangeSlider();
+        rangeSlider = new IntegerRangeSlider();
         rangeSlider.setMin(0);
         rangeSlider.setMax(1000);
-        rangeSlider.setValue(new RangeSliderValue(200, 800));
+        rangeSlider.setValue(new IntegerRangeSliderValue(200, 800));
         rangeSlider.getElement().setAttribute("role", "group");
         add(rangeSlider);
 
-        sliderMinMax = new Slider();
+        sliderMinMax = new IntegerSlider();
         sliderMinMax.setMin(0);
         sliderMinMax.setMax(100);
-        sliderMinMax.setValue(50.0);
+        sliderMinMax.setValue(50);
         sliderMinMax.setMinMaxVisible(true);
         add(sliderMinMax);
 

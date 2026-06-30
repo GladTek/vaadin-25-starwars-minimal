@@ -250,9 +250,9 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
 
     private void styleCard(VerticalLayout card) {
         card.setSpacing(true);
-        card.getStyle().set("background-color", "var(--lumo-base-color)");
-        card.getStyle().set("border-radius", "var(--lumo-size-m)");
-        card.getStyle().set("box-shadow", "var(--lumo-box-shadow-s)");
+        card.getStyle().set("background-color", "var(--aura-background-color)");
+        card.getStyle().set("border-radius", "var(--vaadin-radius-m)");
+        card.getStyle().set("box-shadow", "var(--aura-shadow-s)");
         card.setPadding(true);
     }
 
