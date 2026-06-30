@@ -6,6 +6,7 @@
 ![Vaadin Version](https://img.shields.io/badge/Vaadin-25.2.1-blueviolet?logo=vaadin)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.0-brightgreen?logo=springboot&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-Built_with-646CFF?logo=vite&logoColor=white)
+![Docker Pulls](https://img.shields.io/docker/pulls/achaabni/vaadin-starwars?color=blue&logo=docker)
 
 A modern small demo application built with Vaadin 25 and Spring Boot, demonstrating advanced UI concepts, dynamic scheming dark/light mode, and full internationalization within a Star Wars-themed context.
 
@@ -65,8 +66,8 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 ## 2. Technical Overview
 
 ### Technology Stack
-*   **Framework**: Vaadin Flow 25.1.1
-*   **Backend**: Spring Boot 4.0.5 (Java 21)
+*   **Framework**: Vaadin Flow 25.2.1
+*   **Backend**: Spring Boot 4.1.0 (Java 21)
 *   **Build Tool**: Maven
 
 ### Architecture & Patterns
@@ -112,7 +113,40 @@ The project includes a sample `Dockerfile`:
 *   **Layer Caching**: `pom.xml` is copied and dependencies downloaded *before* source code, allowing Docker to cache the heavy dependency layer.
 *   **Buildkit Caching**: Leverages `--mount=type=cache` to speed up Maven builds.
 
-### CI/CD Workflow
-*   **Github Actions**: Automated pipeline driven by a local `version.json` file.
-*   **Version Control**: The `version.json` controls the image tag and whether to push to the registry, giving granular control over release management.
-*   **Secrets**: To enable deployment, set up `DOCKER_USERNAME` and `DOCKER_PASSWORD` in your GitHub Repository Secrets.
+### Official Docker Image
+A pre-built Docker image is maintained on Docker Hub:
+*   **Docker Image**: `achaabni/vaadin-starwars`
+*   **Docker Hub Page**: [achaabni/vaadin-starwars](https://hub.docker.com/r/achaabni/vaadin-starwars)
+*   **Run Locally**:
+    ```bash
+    docker run -p 8080:8080 achaabni/vaadin-starwars:latest
+    ```
+
+### CI/CD Workflow & Forking Guide
+
+The repository includes a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) that automates building and pushing the Docker image. If you fork this project and want to build/push your own Docker images, follow these steps:
+
+#### 1. Configure GitHub Secrets
+Go to your forked repository's settings under **Settings > Secrets and variables > Actions** and add the following repository secrets:
+*   `DOCKER_USERNAME`: Your Docker Hub username.
+*   `DOCKER_PASSWORD`: Your Docker Hub personal access token or password.
+
+#### 2. Configure `version.json`
+The workflow is driven by the `version.json` file in the root of the project:
+```json
+{
+  "tag": "1.1.0",
+  "update_latest": true,
+  "push": true,
+  "image_name": "vaadin-starwars"
+}
+```
+*   `tag`: The version string applied to the built Docker image (e.g. `1.1.0`).
+*   `update_latest`: If set to `true`, the workflow will also tag the built image as `latest`.
+*   `push`: Set to `true` to authenticate and push the image to Docker Hub under your username (i.e. `your_docker_username/vaadin-starwars:1.1.0`). Set to `false` if you only want the workflow to run a test build without pushing.
+*   `image_name`: The name of the Docker repository/image to create.
+
+#### 3. Triggering the Workflow
+*   The workflow triggers automatically on every push to the `main` branch.
+*   It can also be run manually via the **Actions** tab using the `workflow_dispatch` event.
+
