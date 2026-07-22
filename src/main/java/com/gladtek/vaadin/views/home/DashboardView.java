@@ -2,7 +2,9 @@ package com.gladtek.vaadin.views.home;
 
 import com.gladtek.vaadin.layout.MainLayout;
 import com.gladtek.vaadin.models.Planet;
+import com.gladtek.vaadin.models.Starship;
 import com.gladtek.vaadin.services.PlanetService;
+import com.gladtek.vaadin.services.StarshipService;
 import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.util.LanguageHelper;
 import com.vaadin.flow.component.grid.Grid;
@@ -26,11 +28,14 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
 
     private final UserSession userSession;
     private final PlanetService planetService;
+    private final StarshipService starshipService;
 
     private H2 planetKpiTitle;
     private Span planetKpiValue;
     private H2 populationKpiTitle;
     private Span populationKpiValue;
+    private H2 starshipKpiTitle;
+    private Span starshipKpiValue;
 
     private H3 top5Title;
     private Grid<Planet> top5Grid;
@@ -42,9 +47,19 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
     private Span featuredClimateValue;
     private Span featuredTerrainValue;
 
-    public DashboardView(UserSession userSession, PlanetService planetService) {
+    private H3 featuredStarshipTitle;
+    private H2 featuredStarshipName;
+    private Span featuredStarshipClassLabel;
+    private Span featuredStarshipManufacturerLabel;
+    private Span featuredStarshipCrewLabel;
+    private Span featuredStarshipClassValue;
+    private Span featuredStarshipManufacturerValue;
+    private Span featuredStarshipCrewValue;
+
+    public DashboardView(UserSession userSession, PlanetService planetService, StarshipService starshipService) {
         this.userSession = userSession;
         this.planetService = planetService;
+        this.starshipService = starshipService;
 
         setSizeFull();
         setPadding(true);
@@ -78,7 +93,7 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
         styleCard(planetCard);
         planetCard.getStyle().set("flex-grow", "1");
         planetCard.getStyle().set("min-width", "300px");
-        planetCard.getStyle().set("width", "40%");
+        planetCard.getStyle().set("width", "30%");
 
         populationKpiTitle = new H2();
         populationKpiTitle.getStyle().set("margin", "0").set("font-size", "1.2rem");
@@ -90,31 +105,54 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
         styleCard(popCard);
         popCard.getStyle().set("flex-grow", "1");
         popCard.getStyle().set("min-width", "300px");
-        popCard.getStyle().set("width", "40%");
+        popCard.getStyle().set("width", "30%");
 
-        kpiRow.add(planetCard, popCard);
+        starshipKpiTitle = new H2();
+        starshipKpiTitle.getStyle().set("margin", "0").set("font-size", "1.2rem");
+        starshipKpiValue = new Span(String.valueOf(starshipService.getStarships().size()));
+        starshipKpiValue.getStyle().set("font-size", "2.5rem").set("font-weight", "bold");
+
+        VerticalLayout starshipCard = new VerticalLayout(starshipKpiTitle, starshipKpiValue);
+        styleCard(starshipCard);
+        starshipCard.getStyle().set("flex-grow", "1");
+        starshipCard.getStyle().set("min-width", "300px");
+        starshipCard.getStyle().set("width", "30%");
+
+        kpiRow.add(planetCard, popCard, starshipCard);
         add(kpiRow);
     }
 
     private void createContentRow() {
-        FlexLayout contentRow = new FlexLayout();
+        VerticalLayout contentRow = new VerticalLayout();
         contentRow.setSizeFull();
-        contentRow.setFlexWrap(FlexLayout.FlexWrap.WRAP);
+        contentRow.setPadding(false);
         contentRow.getStyle().set("gap", "20px");
 
         VerticalLayout top5Layout = new VerticalLayout();
         styleCard(top5Layout);
         top5Layout.setPadding(false);
-
+        top5Layout.setWidthFull();
         top5Layout.add(createTop5Section());
-        top5Layout.getStyle().set("flex-grow", "2");
+
+        HorizontalLayout featuredRow = new HorizontalLayout();
+        featuredRow.setWidthFull();
+        featuredRow.getStyle().set("gap", "20px");
 
         VerticalLayout featuredLayout = new VerticalLayout();
         styleCard(featuredLayout);
         featuredLayout.add(createFeaturedSection());
-        featuredLayout.getStyle().set("flex-grow", "1");
+        featuredLayout.setWidth("50%");
 
-        contentRow.add(top5Layout, featuredLayout);
+        VerticalLayout featuredStarshipLayout = new VerticalLayout();
+        styleCard(featuredStarshipLayout);
+        featuredStarshipLayout.add(createFeaturedStarshipSection());
+        featuredStarshipLayout.setWidth("50%");
+
+        featuredRow.setFlexGrow(1, featuredLayout);
+        featuredRow.setFlexGrow(1, featuredStarshipLayout);
+        featuredRow.add(featuredLayout, featuredStarshipLayout);
+
+        contentRow.add(top5Layout, featuredRow);
         add(contentRow);
     }
 
@@ -182,11 +220,43 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
         return layout;
     }
 
+    private VerticalLayout createFeaturedStarshipSection() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.setAlignItems(Alignment.CENTER);
+
+        featuredStarshipTitle = new H3();
+        featuredStarshipName = new H2();
+
+        HorizontalLayout classRow = new HorizontalLayout();
+        featuredStarshipClassLabel = new Span();
+        featuredStarshipClassLabel.getStyle().set("font-weight", "bold");
+        featuredStarshipClassValue = new Span();
+        classRow.add(featuredStarshipClassLabel, new Span(": "), featuredStarshipClassValue);
+
+        HorizontalLayout manufacturerRow = new HorizontalLayout();
+        featuredStarshipManufacturerLabel = new Span();
+        featuredStarshipManufacturerLabel.getStyle().set("font-weight", "bold");
+        featuredStarshipManufacturerValue = new Span();
+        manufacturerRow.add(featuredStarshipManufacturerLabel, new Span(": "), featuredStarshipManufacturerValue);
+
+        HorizontalLayout crewRow = new HorizontalLayout();
+        featuredStarshipCrewLabel = new Span();
+        featuredStarshipCrewLabel.getStyle().set("font-weight", "bold");
+        featuredStarshipCrewValue = new Span();
+        crewRow.add(featuredStarshipCrewLabel, new Span(": "), featuredStarshipCrewValue);
+
+        layout.add(featuredStarshipTitle, featuredStarshipName, classRow, manufacturerRow, crewRow);
+        return layout;
+    }
+
     private void setupReactiveBindings() {
         // KPI Titles
         planetKpiTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.kpi.planets")));
         populationKpiTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.kpi.population")));
-        
+        starshipKpiTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.kpi.starships")));
+
         // KPI Values
         populationKpiValue.bindText(Signal.computed(() -> {
             Locale l = userSession.getLocaleSignal().get();
@@ -217,6 +287,23 @@ public class DashboardView extends VerticalLayout implements HasDynamicTitle {
         ));
         featuredClimateValue.bindText(userSession.getLocaleSignal().map(l -> translateList(featured.climate(), l)));
         featuredTerrainValue.bindText(userSession.getLocaleSignal().map(l -> translateList(featured.terrain(), l)));
+
+        // Featured Starship Section Labels
+        featuredStarshipTitle.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "dashboard.featured.starship.title")));
+        featuredStarshipClassLabel.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "starship.detail.class")));
+        featuredStarshipManufacturerLabel.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "starship.detail.manufacturer")));
+        featuredStarshipCrewLabel.bindText(userSession.getLocaleSignal().map(l -> getTranslation(l, "starship.detail.crew")));
+
+        // Featured Starship Section Values
+        Starship featuredStarship = starshipService.getFeaturedStarship();
+        featuredStarshipName.bindText(userSession.getLocaleSignal().map(l ->
+            getTranslation(l, "starship.name." + featuredStarship.name().toLowerCase().replace(" ", "_"))
+        ));
+        featuredStarshipClassValue.bindText(userSession.getLocaleSignal().map(l ->
+            getTranslation(l, "starship.class." + featuredStarship.starshipClass().toLowerCase().replace(" ", "_"))
+        ));
+        featuredStarshipManufacturerValue.setText(featuredStarship.manufacturer());
+        featuredStarshipCrewValue.setText(featuredStarship.crew());
 
         // Signal Effect for Grid Headers, Data refresh and Page Title
         Signal.effect(this, () -> {

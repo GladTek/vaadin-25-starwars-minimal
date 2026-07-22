@@ -1,32 +1,44 @@
 package com.gladtek.vaadin.services;
 
+import tools.jackson.databind.ObjectMapper;
 import com.gladtek.vaadin.models.Planet;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.vaadin.flow.signals.shared.SharedValueSignal;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PlanetService {
 
-    private final List<Planet> planets = Arrays.asList(
-            new Planet("Tatooine", "Arid", "Desert", new SharedValueSignal<>("200000"), new SharedValueSignal<>(0)),
-            new Planet("Alderaan", "Temperate", "Grasslands, Mountains", new SharedValueSignal<>("2000000000"), new SharedValueSignal<>(0)),
-            new Planet("Yavin IV", "Temperate, Tropical", "Jungle, Rainforests", new SharedValueSignal<>("1000"), new SharedValueSignal<>(0)),
-            new Planet("Hoth", "Frozen", "Tundra, Ice Caves", new SharedValueSignal<>("Unknown"), new SharedValueSignal<>(0)),
-            new Planet("Dagobah", "Murky", "Swamp, Jungles", new SharedValueSignal<>("Unknown"), new SharedValueSignal<>(0)),
-            new Planet("Bespin", "Temperate", "Gas Giant", new SharedValueSignal<>("6000000"), new SharedValueSignal<>(0)),
-            new Planet("Endor", "Temperate", "Forests, Mountains, Lakes", new SharedValueSignal<>("Unknown"), new SharedValueSignal<>(0)),
-            new Planet("Naboo", "Temperate", "Grassy Hills, Swamps, Forests, Mountains", new SharedValueSignal<>("4500000000"), new SharedValueSignal<>(0)),
-            new Planet("Coruscant", "Temperate", "Cityscape, Mountains", new SharedValueSignal<>("1000000000000"), new SharedValueSignal<>(0)),
-            new Planet("Kamino", "Temperate", "Ocean", new SharedValueSignal<>("1000000000"), new SharedValueSignal<>(0))
-    );
+    private record PlanetData(String name, String climate, String terrain, String population) {
+    }
 
-    private final SharedValueSignal<Long> totalPopulationSignal = new SharedValueSignal<>(calculateBaseTotalPopulation());
+    private final List<Planet> planets;
+    private final SharedValueSignal<Long> totalPopulationSignal;
     private final SharedValueSignal<Integer> totalPopulationTrendSignal = new SharedValueSignal<>(0);
+
+    public PlanetService(ObjectMapper objectMapper) {
+        this.planets = loadPlanets(objectMapper);
+        this.totalPopulationSignal = new SharedValueSignal<>(calculateBaseTotalPopulation());
+    }
+
+    private static List<Planet> loadPlanets(ObjectMapper objectMapper) {
+        try (InputStream in = new ClassPathResource("data/planets.json").getInputStream()) {
+            List<PlanetData> data = objectMapper.readValue(in,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, PlanetData.class));
+            return data.stream()
+                    .map(d -> new Planet(d.name(), d.climate(), d.terrain(),
+                            new SharedValueSignal<>(d.population()), new SharedValueSignal<>(0)))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load planets.json", e);
+        }
+    }
 
     private long calculateBaseTotalPopulation() {
         return planets.stream().mapToLong(p -> parsePopulation(p.populationSignal().peek())).sum();

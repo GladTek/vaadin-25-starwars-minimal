@@ -63,6 +63,26 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 
 ---
 
+## Screenshots
+
+| Split Screen Entry | Dashboard |
+|---|---|
+| ![Split Screen Entry](docs/screenshots/01-split-screen.png) | ![Dashboard](docs/screenshots/02-dashboard.png) |
+
+| Planets Grid (Search & Pagination) | Planet Detail (Known Residents) |
+|---|---|
+| ![Planets Grid](docs/screenshots/03-planets-grid.png) | ![Planet Detail](docs/screenshots/04-planet-detail-residents.png) |
+
+| Starships (Master-Detail + Pilot cross-link) | People (Avatars + Planet cross-link) |
+|---|---|
+| ![Starships](docs/screenshots/05-starships.png) | ![People](docs/screenshots/06-people-avatars.png) |
+
+| Vaadin Components Showcase | Arabic (RTL) Layout |
+|---|---|
+| ![Components Showcase](docs/screenshots/07-components.png) | ![Arabic RTL](docs/screenshots/08-rtl-arabic.png) |
+
+---
+
 ## 2. Technical Overview
 
 ### Technology Stack

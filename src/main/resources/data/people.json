@@ -1,0 +1,20 @@
+[
+  { "name": "Luke Skywalker", "gender": "male", "birthYear": "19BBY", "homeworld": "Tatooine", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Luke%20Skywalker" },
+  { "name": "Leia Organa", "gender": "female", "birthYear": "19BBY", "homeworld": "Alderaan", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Leia%20Organa" },
+  { "name": "Han Solo", "gender": "male", "birthYear": "29BBY", "homeworld": "Corellia", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Han%20Solo" },
+  { "name": "Darth Vader", "gender": "male", "birthYear": "41.9BBY", "homeworld": "Tatooine", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Darth%20Vader" },
+  { "name": "Obi-Wan Kenobi", "gender": "male", "birthYear": "57BBY", "homeworld": "Stewjon", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Obi-Wan%20Kenobi" },
+  { "name": "Yoda", "gender": "male", "birthYear": "896BBY", "homeworld": "Unknown", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Yoda" },
+  { "name": "Chewbacca", "gender": "male", "birthYear": "200BBY", "homeworld": "Kashyyyk", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Chewbacca" },
+  { "name": "Lando Calrissian", "gender": "male", "birthYear": "31BBY", "homeworld": "Socorro", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Lando%20Calrissian" },
+  { "name": "Boba Fett", "gender": "male", "birthYear": "31.5BBY", "homeworld": "Kamino", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Boba%20Fett" },
+  { "name": "Padme Amidala", "gender": "female", "birthYear": "46BBY", "homeworld": "Naboo", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Padme%20Amidala" },
+  { "name": "Owen Lars", "gender": "male", "birthYear": "52BBY", "homeworld": "Tatooine", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Owen%20Lars" },
+  { "name": "Beru Whitesun", "gender": "female", "birthYear": "47BBY", "homeworld": "Tatooine", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Beru%20Whitesun" },
+  { "name": "Shmi Skywalker", "gender": "female", "birthYear": "72BBY", "homeworld": "Tatooine", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Shmi%20Skywalker" },
+  { "name": "Sheev Palpatine", "gender": "male", "birthYear": "82BBY", "homeworld": "Naboo", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Sheev%20Palpatine" },
+  { "name": "Jar Jar Binks", "gender": "male", "birthYear": "52BBY", "homeworld": "Naboo", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Jar%20Jar%20Binks" },
+  { "name": "Bail Organa", "gender": "male", "birthYear": "67BBY", "homeworld": "Alderaan", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Bail%20Organa" },
+  { "name": "Jango Fett", "gender": "male", "birthYear": "66BBY", "homeworld": "Kamino", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Jango%20Fett" },
+  { "name": "Tarfful", "gender": "male", "birthYear": "unknown", "homeworld": "Kashyyyk", "imageUrl": "https://api.dicebear.com/10.x/lorelei/svg?seed=Tarfful" }
+]

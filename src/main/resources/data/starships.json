@@ -1,0 +1,12 @@
+[
+  { "name": "Millennium Falcon", "starshipClass": "Light Freighter", "manufacturer": "Corellian Engineering Corporation", "crew": "4", "pilot": "Han Solo" },
+  { "name": "X-wing", "starshipClass": "Starfighter", "manufacturer": "Incom Corporation", "crew": "1", "pilot": "Luke Skywalker" },
+  { "name": "TIE Fighter", "starshipClass": "Starfighter", "manufacturer": "Sienar Fleet Systems", "crew": "1", "pilot": "Darth Vader" },
+  { "name": "Star Destroyer", "starshipClass": "Capital Ship", "manufacturer": "Kuat Drive Yards", "crew": "47060", "pilot": "" },
+  { "name": "Death Star", "starshipClass": "Space Station", "manufacturer": "Imperial Department of Military Research", "crew": "342953", "pilot": "" },
+  { "name": "Slave I", "starshipClass": "Patrol Craft", "manufacturer": "Kuat Systems Engineering", "crew": "1", "pilot": "Boba Fett" },
+  { "name": "Y-wing", "starshipClass": "Starfighter", "manufacturer": "Koensayr Manufacturing", "crew": "2", "pilot": "" },
+  { "name": "A-wing", "starshipClass": "Starfighter", "manufacturer": "Kuat Systems Engineering", "crew": "1", "pilot": "" },
+  { "name": "B-wing", "starshipClass": "Starfighter", "manufacturer": "Slayn & Korpil", "crew": "1", "pilot": "" },
+  { "name": "Executor", "starshipClass": "Star Dreadnought", "manufacturer": "Kuat Drive Yards", "crew": "279144", "pilot": "Darth Vader" }
+]

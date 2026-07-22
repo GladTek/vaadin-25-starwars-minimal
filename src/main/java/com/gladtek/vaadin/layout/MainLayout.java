@@ -9,8 +9,10 @@ import com.gladtek.vaadin.services.UserSession;
 import com.gladtek.vaadin.util.LanguageHelper;
 import com.gladtek.vaadin.views.home.DashboardView;
 import com.gladtek.vaadin.views.home.SplitScreenView;
+import com.gladtek.vaadin.views.people.PeopleView;
 import com.gladtek.vaadin.views.planets.PlanetsView;
 import com.gladtek.vaadin.views.showcase.ComponentsView;
+import com.gladtek.vaadin.views.starships.StarshipsView;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
@@ -46,12 +48,15 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     private H1 logo;
     private SideNavItem dashboardItem;
     private SideNavItem planetsItem;
+    private SideNavItem starshipsItem;
+    private SideNavItem peopleItem;
     private SideNavItem componentsItem;
     private SideNavItem logoutItem;
     private Span profileName;
     private SideNav nav;
     private SideNav footerNav;
     private Breadcrumbs breadcrumbs;
+    private Class<?> currentViewClass;
 
     public MainLayout(UserSession userSession, AllianceRegistry allianceRegistry) {
         this.userSession = userSession;
@@ -116,10 +121,14 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         
         dashboardItem = new SideNavItem("", DashboardView.class, VaadinIcon.DASHBOARD.create());
         planetsItem = new SideNavItem("", PlanetsView.class, VaadinIcon.GLOBE.create());
+        starshipsItem = new SideNavItem("", StarshipsView.class, VaadinIcon.ROCKET.create());
+        peopleItem = new SideNavItem("", PeopleView.class, VaadinIcon.USERS.create());
         componentsItem = new SideNavItem("", ComponentsView.class, VaadinIcon.CUBES.create());
 
         nav.addItem(dashboardItem);
         nav.addItem(planetsItem);
+        nav.addItem(starshipsItem);
+        nav.addItem(peopleItem);
         nav.addItem(componentsItem);
 
         logoutItem = new SideNavItem("", LogoutView.class, VaadinIcon.SIGN_OUT.create());
@@ -145,6 +154,8 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
             // SideNav Items
             dashboardItem.setLabel(getTranslation(l, "nav.dashboard"));
             planetsItem.setLabel(getTranslation(l, "nav.planets"));
+            starshipsItem.setLabel(getTranslation(l, "nav.starships"));
+            peopleItem.setLabel(getTranslation(l, "nav.people"));
             componentsItem.setLabel(getTranslation(l, "nav.components"));
             logoutItem.setLabel(getTranslation(l, "nav.logout"));
             
@@ -153,6 +164,12 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
                 Direction dir = LanguageHelper.isRtl(l) ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT;
                 ui.setDirection(dir);
             });
+
+            // Breadcrumb text (re-translate for the currently active view)
+            if (currentViewClass != null) {
+                String pageName = getPageTitleFor(currentViewClass, l);
+                updateBreadcrumbs(currentViewClass, pageName, l);
+            }
         });
     }
 
@@ -211,9 +228,10 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
             allianceRegistry.registerOrUpdate(sessionId, ui.getUIId(), side, userSession.getProfileName());
             
             Locale locale = userSession.getLocaleSignal().peek();
-            String pageName = getPageTitleFor(event.getNavigationTarget(), locale);
+            currentViewClass = event.getNavigationTarget();
+            String pageName = getPageTitleFor(currentViewClass, locale);
             allianceRegistry.updateCurrentPage(sessionId, pageName);
-            updateBreadcrumbs(event.getNavigationTarget(), pageName, locale);
+            updateBreadcrumbs(currentViewClass, pageName, locale);
         }
     }
 
@@ -232,6 +250,8 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         if (viewClass == null) return "Galaxy Map";
         if (viewClass.equals(DashboardView.class)) return getTranslation(locale, "nav.dashboard");
         if (viewClass.equals(PlanetsView.class)) return getTranslation(locale, "nav.planets");
+        if (viewClass.equals(StarshipsView.class)) return getTranslation(locale, "nav.starships");
+        if (viewClass.equals(PeopleView.class)) return getTranslation(locale, "nav.people");
         if (viewClass.equals(ComponentsView.class)) return getTranslation(locale, "nav.components");
         return viewClass.getSimpleName();
     }

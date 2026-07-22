@@ -3,6 +3,7 @@ package com.gladtek.vaadin.services;
 import com.gladtek.vaadin.models.Planet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ class PlanetServiceTest {
 
     @BeforeEach
     void setUp() {
-        planetService = new PlanetService();
+        planetService = new PlanetService(new ObjectMapper());
     }
 
     @Test
