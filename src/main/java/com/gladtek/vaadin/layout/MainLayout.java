@@ -19,6 +19,8 @@ import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.breadcrumbs.Breadcrumbs;
+import com.vaadin.flow.component.breadcrumbs.BreadcrumbsItem;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Main;
@@ -26,6 +28,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
@@ -48,6 +51,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     private Span profileName;
     private SideNav nav;
     private SideNav footerNav;
+    private Breadcrumbs breadcrumbs;
 
     public MainLayout(UserSession userSession, AllianceRegistry allianceRegistry) {
         this.userSession = userSession;
@@ -88,6 +92,12 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         rightSide.setSpacing(true);
 
         rightSide.add(alliancePresence, profileName, schemeToggle, languageSwitcher);
+
+        breadcrumbs = new Breadcrumbs(Breadcrumbs.Mode.MANUAL);
+        breadcrumbs.getStyle()
+                .set("box-sizing", "border-box")
+                .set("padding", "0.75rem 1rem 0 1rem")
+                .set("flex-shrink", "0");
 
         HorizontalLayout headerLayout = new HorizontalLayout();
         headerLayout.setWidth("100%");
@@ -173,7 +183,13 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         if (content instanceof Main) {
             super.setContent(content);
         } else {
-            Main main = new Main(content);
+            VerticalLayout wrapper = new VerticalLayout(breadcrumbs, content);
+            wrapper.setPadding(false);
+            wrapper.setSpacing(false);
+            wrapper.setSizeFull();
+            wrapper.setFlexGrow(1, content);
+
+            Main main = new Main(wrapper);
             main.setSizeFull();
             super.setContent(main);
         }
@@ -194,8 +210,21 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
             String sessionId = ui.getSession().getSession().getId();
             allianceRegistry.registerOrUpdate(sessionId, ui.getUIId(), side, userSession.getProfileName());
             
-            String pageName = getPageTitleFor(event.getNavigationTarget(), userSession.getLocaleSignal().peek());
+            Locale locale = userSession.getLocaleSignal().peek();
+            String pageName = getPageTitleFor(event.getNavigationTarget(), locale);
             allianceRegistry.updateCurrentPage(sessionId, pageName);
+            updateBreadcrumbs(event.getNavigationTarget(), pageName, locale);
+        }
+    }
+
+    private void updateBreadcrumbs(Class<?> viewClass, String pageName, Locale locale) {
+        breadcrumbs.removeAll();
+        if (viewClass != null && viewClass.equals(DashboardView.class)) {
+            breadcrumbs.add(new BreadcrumbsItem(pageName));
+        } else {
+            String homeUrl = RouteConfiguration.forSessionScope().getUrl(DashboardView.class);
+            breadcrumbs.add(new BreadcrumbsItem(getTranslation(locale, "nav.dashboard"), homeUrl));
+            breadcrumbs.add(new BreadcrumbsItem(pageName));
         }
     }
 

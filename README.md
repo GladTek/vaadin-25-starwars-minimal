@@ -3,7 +3,7 @@
 ![GitHub Release](https://img.shields.io/github/v/release/GladTek/vaadin-25-starwars-minimal?color=blue&label=version)
 ![License](https://img.shields.io/github/license/GladTek/vaadin-25-starwars-minimal?color=green)
 ![Java Version](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
-![Vaadin Version](https://img.shields.io/badge/Vaadin-25.2.1-blueviolet?logo=vaadin)
+![Vaadin Version](https://img.shields.io/badge/Vaadin-25.2.3-blueviolet?logo=vaadin)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.0-brightgreen?logo=springboot&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-Built_with-646CFF?logo=vite&logoColor=white)
 ![Docker Pulls](https://img.shields.io/docker/pulls/achaabni/vaadin-starwars?color=blue&logo=docker)
@@ -66,7 +66,7 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 ## 2. Technical Overview
 
 ### Technology Stack
-*   **Framework**: Vaadin Flow 25.2.1
+*   **Framework**: Vaadin Flow 25.2.3
 *   **Backend**: Spring Boot 4.1.0 (Java 21)
 *   **Build Tool**: Maven
 

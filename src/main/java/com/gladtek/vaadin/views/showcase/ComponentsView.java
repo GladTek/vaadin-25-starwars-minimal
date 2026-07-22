@@ -41,7 +41,6 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
         contentContainer.setSizeFull();
 
         // Create contents using new component classes inject session
-        ExperimentalSection experimentalSection = new ExperimentalSection(userSession);
         InputSection inputSection = new InputSection(userSession);
         ButtonSection buttonSection = new ButtonSection(userSession);
         SelectionSection selectionSection = new SelectionSection(userSession);
@@ -50,7 +49,6 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
         DialogSection dialogSection = new DialogSection(userSession);
 
         // Style sections
-        styleSection(experimentalSection);
         styleSection(inputSection);
         styleSection(buttonSection);
         styleSection(selectionSection);
@@ -61,7 +59,6 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
         tabSheet = new TabSheet();
         tabSheet.setSizeFull();
         // Add content, label will be assigned via Signal
-        Tab expTab = tabSheet.add("", experimentalSection);
         Tab inTab = tabSheet.add("", inputSection);
         Tab btnTab = tabSheet.add("", buttonSection);
         Tab selTab = tabSheet.add("", selectionSection);
@@ -79,7 +76,6 @@ public class ComponentsView extends VerticalLayout implements HasDynamicTitle {
             Locale l = userSession.getLocaleSignal().get();
             
             // Tab labels
-            expTab.setLabel(getTranslation(l, "components.tab.experimental"));
             inTab.setLabel(getTranslation(l, "components.tab.inputs"));
             btnTab.setLabel(getTranslation(l, "components.tab.buttons"));
             selTab.setLabel(getTranslation(l, "components.tab.selection"));
