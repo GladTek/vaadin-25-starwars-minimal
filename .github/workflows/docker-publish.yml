@@ -3,6 +3,7 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   workflow_dispatch:
 
 jobs:
@@ -19,10 +20,19 @@ jobs:
       - name: Read Version Config
         id: config
         run: |
-          echo "TAG=$(jq -r .tag version.json)" >> $GITHUB_OUTPUT
-          echo "UPDATE_LATEST=$(jq -r .update_latest version.json)" >> $GITHUB_OUTPUT
-          echo "SHOULD_PUSH=$(jq -r .push version.json)" >> $GITHUB_OUTPUT
-          echo "IMAGE_NAME=$(jq -r .image_name version.json)" >> $GITHUB_OUTPUT
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # Tag push (e.g. v1.2.0): derive everything from the tag itself,
+            # so a release is never dependent on version.json being up to date.
+            echo "TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+            echo "UPDATE_LATEST=true" >> $GITHUB_OUTPUT
+            echo "SHOULD_PUSH=true" >> $GITHUB_OUTPUT
+            echo "IMAGE_NAME=$(jq -r .image_name version.json)" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=$(jq -r .tag version.json)" >> $GITHUB_OUTPUT
+            echo "UPDATE_LATEST=$(jq -r .update_latest version.json)" >> $GITHUB_OUTPUT
+            echo "SHOULD_PUSH=$(jq -r .push version.json)" >> $GITHUB_OUTPUT
+            echo "IMAGE_NAME=$(jq -r .image_name version.json)" >> $GITHUB_OUTPUT
+          fi
 
       - name: Login to Docker Hub
         if: steps.config.outputs.SHOULD_PUSH == 'true'
