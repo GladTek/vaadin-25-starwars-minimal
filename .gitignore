@@ -8,6 +8,10 @@ build/
 
 .DS_Store
 
+# Debug/scratch output
+*.log
+tree.txt
+
 # The following files are generated/updated by vaadin-maven-plugin or vaadin-gradle-plugin
 node_modules/
 src/main/frontend/generated/
