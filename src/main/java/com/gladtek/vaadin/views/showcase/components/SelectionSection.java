@@ -2,6 +2,7 @@ package com.gladtek.vaadin.views.showcase.components;
 
 import com.gladtek.vaadin.services.UserSession;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.checkbox.Switch;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -18,6 +19,7 @@ public class SelectionSection extends VerticalLayout {
     private final ComboBox<String> comboBox;
     private final Select<String> select;
     private final Checkbox checkbox;
+    private final Switch switchComponent;
     private final RadioButtonGroup<String> radioGroup;
 
     public SelectionSection(UserSession userSession) {
@@ -42,15 +44,19 @@ public class SelectionSection extends VerticalLayout {
         row1.add(comboBox, select);
 
         HorizontalLayout row2 = new HorizontalLayout();
+        row2.setAlignItems(Alignment.BASELINE);
         checkbox = new Checkbox();
         checkbox.setValue(true);
+
+        switchComponent = new Switch();
+        switchComponent.setValue(true);
 
         radioGroup = new RadioButtonGroup<>();
         radioGroup.setItems("components.select.option1", "components.select.option2", "components.select.option3");
         radioGroup.setItemLabelGenerator(key -> getTranslation(userSession.getLocaleSignal().peek(), key));
         radioGroup.setValue("components.select.option1");
 
-        row2.add(checkbox, radioGroup);
+        row2.add(checkbox, switchComponent, radioGroup);
 
         add(row1, row2);
 
@@ -67,6 +73,7 @@ public class SelectionSection extends VerticalLayout {
             select.getListDataView().refreshAll();
 
             checkbox.setLabel(getTranslation(l, "components.select.checkbox"));
+            switchComponent.setLabel(getTranslation(l, "components.select.switch"));
 
             radioGroup.setLabel(getTranslation(l, "components.select.radiogroup"));
             // Force redraw of items

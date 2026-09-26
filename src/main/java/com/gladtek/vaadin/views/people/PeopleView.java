@@ -55,7 +55,7 @@ public class PeopleView extends VerticalLayout implements HasDynamicTitle, Befor
         grid = new Grid<>(Person.class);
         grid.removeAllColumns();
 
-        grid.addColumn(new com.vaadin.flow.data.renderer.ComponentRenderer<>(person -> {
+        grid.addColumn(new com.vaadin.flow.data.renderer.ComponentRenderer<Avatar, Person>(person -> {
                     Avatar avatar = new Avatar(translateName(person, userSession.getLocaleSignal().peek()));
                     avatar.setImage(person.imageUrl());
                     return avatar;
@@ -87,13 +87,13 @@ public class PeopleView extends VerticalLayout implements HasDynamicTitle, Befor
                 .setKey("homeworld")
                 .setComparator((p1, p2) -> p1.homeworld().compareToIgnoreCase(p2.homeworld()));
 
-        grid.setColumnOrder(
+        grid.setColumnOrder(List.of(
                 grid.getColumnByKey("avatar"),
                 grid.getColumnByKey("name"),
                 grid.getColumnByKey("gender"),
                 grid.getColumnByKey("birthYear"),
                 grid.getColumnByKey("homeworld")
-        );
+        ));
 
         paginator = new GridPaginator(10, List.of(5, 10, 25, 50));
         gridController = new PaginatedGridController<>(grid, paginator, personService.getPeople());

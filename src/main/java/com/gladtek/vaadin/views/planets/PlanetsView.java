@@ -108,12 +108,12 @@ public class PlanetsView extends VerticalLayout implements HasDynamicTitle, Befo
                         planetService.parsePopulation(p1.populationSignal().peek()),
                         planetService.parsePopulation(p2.populationSignal().peek())));
 
-        grid.setColumnOrder(
+        grid.setColumnOrder(List.of(
                 grid.getColumnByKey("name"),
                 grid.getColumnByKey("climate"),
                 grid.getColumnByKey("terrain"),
                 grid.getColumnByKey("population")
-        );
+        ));
 
         paginator = new GridPaginator(10, List.of(5, 10, 25, 50));
         gridController = new PaginatedGridController<>(grid, paginator, planetService.getPlanets());

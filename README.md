@@ -3,7 +3,7 @@
 ![GitHub Release](https://img.shields.io/github/v/release/GladTek/vaadin-25-starwars-minimal?color=blue&label=version)
 ![License](https://img.shields.io/github/license/GladTek/vaadin-25-starwars-minimal?color=green)
 ![Java Version](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
-![Vaadin Version](https://img.shields.io/badge/Vaadin-25.2.3-blueviolet?logo=vaadin)
+![Vaadin Version](https://img.shields.io/badge/Vaadin-25.3.0-blueviolet?logo=vaadin)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.0-brightgreen?logo=springboot&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-Built_with-646CFF?logo=vite&logoColor=white)
 ![Docker Pulls](https://img.shields.io/docker/pulls/achaabni/vaadin-starwars?color=blue&logo=docker)
@@ -86,7 +86,7 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 ## 2. Technical Overview
 
 ### Technology Stack
-*   **Framework**: Vaadin Flow 25.2.3
+*   **Framework**: Vaadin Flow 25.3.0
 *   **Backend**: Spring Boot 4.1.0 (Java 21)
 *   **Build Tool**: Maven
 
@@ -133,40 +133,47 @@ The project includes a sample `Dockerfile`:
 *   **Layer Caching**: `pom.xml` is copied and dependencies downloaded *before* source code, allowing Docker to cache the heavy dependency layer.
 *   **Buildkit Caching**: Leverages `--mount=type=cache` to speed up Maven builds.
 
-### Official Docker Image
-A pre-built Docker image is maintained on Docker Hub:
-*   **Docker Image**: `achaabni/vaadin-starwars`
-*   **Docker Hub Page**: [achaabni/vaadin-starwars](https://hub.docker.com/r/achaabni/vaadin-starwars)
-*   **Run Locally**:
-    ```bash
-    docker run -p 8080:8080 achaabni/vaadin-starwars:latest
-    ```
+### Container Registries & Running
+
+Pre-built Docker images are published to both GitHub Container Registry (GHCR) and Docker Hub:
+
+#### Run from GitHub Container Registry (GHCR):
+```bash
+docker run -p 8080:8080 ghcr.io/gladtek/vaadin-starwars:latest
+```
+
+#### Run from Docker Hub:
+```bash
+docker run -p 8080:8080 achaabni/vaadin-starwars:latest
+```
 
 ### CI/CD Workflow & Forking Guide
 
-The repository includes a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) that automates building and pushing the Docker image. If you fork this project and want to build/push your own Docker images, follow these steps:
+The repository includes a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) that automates building and pushing Docker images to **GitHub Container Registry (`ghcr.io`)** and optionally **Docker Hub**.
 
-#### 1. Configure GitHub Secrets
-Go to your forked repository's settings under **Settings > Secrets and variables > Actions** and add the following repository secrets:
+#### 1. GitHub Container Registry (Automatic)
+The workflow automatically authenticates with `ghcr.io` using `GITHUB_TOKEN` and publishes images under `ghcr.io/<owner>/vaadin-starwars`.
+
+#### 2. Optional Docker Hub Secrets
+If you also want to push images to Docker Hub, configure repository secrets under **Settings > Secrets and variables > Actions**:
 *   `DOCKER_USERNAME`: Your Docker Hub username.
 *   `DOCKER_PASSWORD`: Your Docker Hub personal access token or password.
 
-#### 2. Configure `version.json`
+#### 3. Configure `version.json`
 The workflow is driven by the `version.json` file in the root of the project:
 ```json
 {
-  "tag": "1.1.0",
+  "tag": "1.1.1",
   "update_latest": true,
   "push": true,
   "image_name": "vaadin-starwars"
 }
 ```
-*   `tag`: The version string applied to the built Docker image (e.g. `1.1.0`).
+*   `tag`: The version string applied to the built Docker image (e.g. `1.1.1`).
 *   `update_latest`: If set to `true`, the workflow will also tag the built image as `latest`.
-*   `push`: Set to `true` to authenticate and push the image to Docker Hub under your username (i.e. `your_docker_username/vaadin-starwars:1.1.0`). Set to `false` if you only want the workflow to run a test build without pushing.
+*   `push`: Set to `true` to authenticate and push the image. Set to `false` if you only want the workflow to run a test build without pushing.
 *   `image_name`: The name of the Docker repository/image to create.
 
-#### 3. Triggering the Workflow
-*   The workflow triggers automatically on every push to the `main` branch.
+#### 4. Triggering the Workflow
+*   The workflow triggers automatically on every push to the `main` branch or tag pushes (`v*`).
 *   It can also be run manually via the **Actions** tab using the `workflow_dispatch` event.
-

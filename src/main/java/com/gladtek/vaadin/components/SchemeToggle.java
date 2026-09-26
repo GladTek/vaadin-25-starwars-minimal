@@ -15,30 +15,27 @@ public class SchemeToggle extends Button {
 
         addThemeVariants(ButtonVariant.TERTIARY);
         
-        String initialTheme = userSession.getSelectedSide();
-        if ("dark".equalsIgnoreCase(initialTheme)) {
-            setIcon(VaadinIcon.SUN_O.create());
+        boolean isDark = "dark".equalsIgnoreCase(userSession.getSelectedSide());
+        applyTheme(isDark, userSession);
+
+        addClickListener(e -> {
+            boolean currentDark = "dark".equalsIgnoreCase(userSession.getSelectedSide());
+            applyTheme(!currentDark, userSession);
+        });
+    }
+
+    private void applyTheme(boolean isDark, UserSession userSession) {
+        var page = UI.getCurrent().getPage();
+        if (isDark) {
+            setIcon(VaadinIcon.SUN.create());
             setAriaLabel(getTranslation("nav.theme.light"));
-            UI.getCurrent().getPage().setColorScheme(ColorScheme.Value.DARK);
+            page.setColorScheme(ColorScheme.Value.DARK);
+            userSession.setSelectedSide("dark");
         } else {
             setIcon(VaadinIcon.MOON.create());
             setAriaLabel(getTranslation("nav.theme.dark"));
-            UI.getCurrent().getPage().setColorScheme(ColorScheme.Value.LIGHT);
+            page.setColorScheme(ColorScheme.Value.LIGHT);
+            userSession.setSelectedSide("light");
         }
-
-        addClickListener(e -> {
-            var page = UI.getCurrent().getPage();
-            if (e.getSource().getIcon().getElement().getAttribute("icon").equals("vaadin:sun-o")) {
-                page.setColorScheme(ColorScheme.Value.LIGHT);
-                e.getSource().setIcon(VaadinIcon.MOON.create());
-                setAriaLabel(getTranslation("nav.theme.dark"));
-                userSession.setSelectedSide("light");
-            } else {
-                page.setColorScheme(ColorScheme.Value.DARK);
-                e.getSource().setIcon(VaadinIcon.SUN_O.create());
-                setAriaLabel(getTranslation("nav.theme.light"));
-                userSession.setSelectedSide("dark");
-            }
-        });
     }
 }

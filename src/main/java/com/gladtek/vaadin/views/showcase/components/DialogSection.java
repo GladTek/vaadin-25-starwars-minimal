@@ -151,7 +151,7 @@ public class DialogSection extends VerticalLayout {
     }
 
     public Button createCloseBtn(Notification notification, Locale l) {
-        Button closeBtn = new Button(VaadinIcon.CLOSE_SMALL.create(), e -> notification.close());
+        Button closeBtn = new Button(VaadinIcon.CLOSE.create(), e -> notification.close());
         closeBtn.setAriaLabel(getTranslation(l, "components.dialog.close_aria"));
         return closeBtn;
     }

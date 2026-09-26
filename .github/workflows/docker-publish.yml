@@ -6,6 +6,10 @@ on:
     tags: [ "v*" ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -19,6 +23,8 @@ jobs:
 
       - name: Read Version Config
         id: config
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             # Tag push (e.g. v1.2.0): derive everything from the tag itself,
@@ -34,8 +40,22 @@ jobs:
             echo "IMAGE_NAME=$(jq -r .image_name version.json)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Login to Docker Hub
+          if [ -n "$DOCKER_USERNAME" ]; then
+            echo "HAS_DOCKER_HUB=true" >> $GITHUB_OUTPUT
+          else
+            echo "HAS_DOCKER_HUB=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GitHub Container Registry
         if: steps.config.outputs.SHOULD_PUSH == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Docker Hub
+        if: steps.config.outputs.SHOULD_PUSH == 'true' && steps.config.outputs.HAS_DOCKER_HUB == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -46,11 +66,25 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
-          IMAGE_ID="$DOCKER_USERNAME/${{ steps.config.outputs.IMAGE_NAME }}"
-          TAGS="$IMAGE_ID:${{ steps.config.outputs.TAG }}"
-          if [ "${{ steps.config.outputs.UPDATE_LATEST }}" = "true" ]; then
-            TAGS="$TAGS,$IMAGE_ID:latest"
+          TAG="${{ steps.config.outputs.TAG }}"
+          IMAGE_NAME="${{ steps.config.outputs.IMAGE_NAME }}"
+          UPDATE_LATEST="${{ steps.config.outputs.UPDATE_LATEST }}"
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+
+          GHCR_IMAGE="ghcr.io/$OWNER/$IMAGE_NAME"
+          TAGS="$GHCR_IMAGE:$TAG"
+          if [ "$UPDATE_LATEST" = "true" ]; then
+            TAGS="$TAGS,$GHCR_IMAGE:latest"
           fi
+
+          if [ -n "$DOCKER_USERNAME" ]; then
+            DH_IMAGE="$DOCKER_USERNAME/$IMAGE_NAME"
+            TAGS="$TAGS,$DH_IMAGE:$TAG"
+            if [ "$UPDATE_LATEST" = "true" ]; then
+              TAGS="$TAGS,$DH_IMAGE:latest"
+            fi
+          fi
+
           echo "DOCKER_TAGS=$TAGS" >> $GITHUB_OUTPUT
 
       - name: Build and push

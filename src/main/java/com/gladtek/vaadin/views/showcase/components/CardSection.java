@@ -1,6 +1,8 @@
 package com.gladtek.vaadin.views.showcase.components;
 
 import com.gladtek.vaadin.services.UserSession;
+import com.vaadin.flow.component.badge.Badge;
+import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.card.Card;
@@ -19,7 +21,7 @@ public class CardSection extends VerticalLayout {
     private final Span simpleCardContent;
     
     private final Card imageCard;
-    private final Span badge;
+    private final Badge badge;
     private final Span imageCardContent;
     private final Button bookBtn;
     private final Button learnBtn;
@@ -44,8 +46,8 @@ public class CardSection extends VerticalLayout {
         imageCard.setWidth("300px");
         imageCard.setMedia(mediaImage);
 
-        badge = new Span();
-        badge.getElement().getThemeList().add("badge success");
+        badge = new Badge();
+        badge.addThemeVariants(BadgeVariant.SUCCESS);
         imageCard.setHeaderSuffix(badge);
 
         imageCardContent = new Span();

@@ -72,12 +72,12 @@ public class StarshipsView extends VerticalLayout implements HasDynamicTitle {
                 .setKey("crew")
                 .setComparator((s1, s2) -> Long.compare(parseCrew(s1.crew()), parseCrew(s2.crew())));
 
-        grid.setColumnOrder(
+        grid.setColumnOrder(List.of(
                 grid.getColumnByKey("name"),
                 grid.getColumnByKey("class"),
                 grid.getColumnByKey("manufacturer"),
                 grid.getColumnByKey("crew")
-        );
+        ));
 
         paginator = new GridPaginator(10, List.of(5, 10, 25, 50));
         gridController = new PaginatedGridController<>(grid, paginator, starshipService.getStarships());
